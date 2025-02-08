@@ -1,46 +1,40 @@
-type BondFinderResponse = {
-  date: string;
-  cols: string[];
-  rows: (string | number | number[])[][];
-};
-
-type Bond = {
+export type Bond = {
   isin: string;
   name: string;
   maturityDate: Date;
-  closeYield: number;
-  rub: boolean;
+  yield: number;
   rating: number;
 };
 
-export async function getBonds() {
+export async function getBonds(): Promise<Bond[]> {
   const bondFinderResponse = await fetch(
     "https://raw.githubusercontent.com/bond-finder-lab/backend/refs/heads/master/docs/report-v1.json",
   );
 
-  const data = await bondFinderResponse.json() as BondFinderResponse;
+  const data = await bondFinderResponse.json() as {
+    date: string;
+    cols: string[];
+    rows: any[][];
+  };
 
-  const indicies = data.cols.reduce((acc, name, i) => {
-    acc[name] = i;
-    return acc;
-  }, {} as Record<string, number>);
+  const indicies = Object.fromEntries(data.cols.map((v, i) => [v, i]));
 
-  return data.rows.reduce((acc, row) => {
+  return data.rows.reduce((acc: Bond[], row) => {
+    const isRub = row[indicies["rub"]];
     const highRisk = row[indicies["high_risk"]];
     const hasOffer = row[indicies["has_offer"]];
     const isQual = row[indicies["qual"]];
 
-    if (!highRisk && !hasOffer && !isQual) {
+    if (isRub && !highRisk && !hasOffer && !isQual) {
       acc.push({
-        isin: row[indicies["isin"]] as string,
-        name: row[indicies["name"]] as string,
-        maturityDate: new Date(row[indicies["maturity_date"]] as string),
-        closeYield: row[indicies["close_yield"]] as number,
-        rub: Boolean(row[indicies["rub"]]),
-        rating: row[indicies["rating"]] as number,
+        isin: row[indicies["isin"]],
+        name: row[indicies["name"]],
+        maturityDate: new Date(row[indicies["maturity_date"]]),
+        yield: row[indicies["close_yield"]],
+        rating: row[indicies["rating"]],
       });
     }
 
     return acc;
-  }, [] as Bond[]).sort((a, b) => a.rating - b.rating);
+  }, []).sort((a, b) => (b.yield || 0) - (a.yield || 0));
 }

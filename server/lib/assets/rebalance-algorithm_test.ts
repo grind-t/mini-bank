@@ -1,4 +1,4 @@
-import { Asset, rebalanceAssets } from "./assets.ts";
+import { Asset, rebalanceAssets } from "./rebalance-algorithm.ts";
 import { assertEquals } from "jsr:@std/assert";
 
 Deno.test("rebalanceAssets should correctly rebalance assets", () => {

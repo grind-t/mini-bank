@@ -1,23 +1,41 @@
+import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import { getBonds } from "./lib/bonds.ts";
-import { tbankFetch } from "./lib/tbank_api.ts";
+import { publicProcedure, router } from "./trpc.ts";
+import { z } from "zod";
+import { getDCAStrategy, setDCAStrategy } from "./lib/assets/dca-strategy.ts";
 
-const BONDS_ROUTE = new URLPattern({ pathname: "/bonds" });
+const kv = await Deno.openKv();
 
-Deno.serve(async (req) => {
-  if (BONDS_ROUTE.test(req.url)) {
-    const bonds = await tbankFetch(
-      "tinkoff.public.invest.api.contract.v1.InstrumentsService/Bonds",
-      "POST",
-      {
-        instrumentStatus: "INSTRUMENT_STATUS_BASE",
-        instrumentExchange: "INSTRUMENT_EXCHANGE_UNSPECIFIED",
+const appRouter = router({
+  getBonds: publicProcedure.query(async () => {
+    return await getBonds();
+  }),
+  getDCAStrategy: publicProcedure.input(z.object({
+    id: z.string(),
+  })).query(
+    async ({ input }) => {
+      return await getDCAStrategy(input.id, kv);
+    },
+  ),
+  setDCAStrategy: publicProcedure.input(
+    z.object({
+      id: z.string(),
+      currentMonthBudget: z.number(),
+      assets: z.array(z.object({ isin: z.string(), weight: z.number() })),
+    }),
+  )
+    .mutation(
+      async ({ input }) => {
+        // TODO: Auth
+        return await setDCAStrategy(input, kv);
       },
-    );
-    return new Response(JSON.stringify(await bonds.json(), null, 2));
-    //return new Response(JSON.stringify(await getBonds(), null, 2));
-  }
-
-  return new Response("Not found", {
-    status: 404,
-  });
+    ),
 });
+
+const server = createHTTPServer({
+  router: appRouter,
+});
+
+server.listen(3000);
+
+export type AppRouter = typeof appRouter;

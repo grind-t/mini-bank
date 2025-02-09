@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { getBonds } from "$lib/api";
 
   onMount(async () => {
     //const greetMsg = await invoke("greet", { name: "world" });
@@ -16,9 +17,13 @@
     }).format(Date.now())}"
   />
 
-  <ul class="list">
-    {#each { length: 8 } as _, i}
-      <li class="list-row">Облигация {i + 1}</li>
-    {/each}
-  </ul>
+  {#await getBonds()}
+    ...
+  {:then bonds}
+    <ul class="list">
+      {#each bonds as bond}
+        <li class="list-row">{bond.name} {bond.yield}%</li>
+      {/each}
+    </ul>
+  {/await}
 </main>

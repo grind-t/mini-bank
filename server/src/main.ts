@@ -3,6 +3,7 @@ import { getBonds } from "./lib/bonds.ts";
 import { publicProcedure, router } from "./trpc.ts";
 import { z } from "zod";
 import { Level } from "level";
+import cors from "cors";
 
 const db = new Level<string, any>("./db", { valueEncoding: "json" });
 const dcaStrategies = db.sublevel<string, any>("dca-strategies", {
@@ -36,6 +37,7 @@ const appRouter = router({
 });
 
 const server = createHTTPServer({
+  middleware: cors(),
   router: appRouter,
 });
 

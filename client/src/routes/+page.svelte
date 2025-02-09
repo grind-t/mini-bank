@@ -1,11 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { getBonds } from "$lib/api";
-  import {
-    getCurrentMonthName,
-    getDistanceInYears,
-    getDistanceInYearsText,
-  } from "$lib/date";
+  import { getCurrentMonthName, getDistanceInYearsText } from "$lib/date";
   import { getBondRatingText } from "$lib/bonds";
 
   onMount(async () => {

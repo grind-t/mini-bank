@@ -2,9 +2,12 @@ import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import { getBonds } from "./lib/bonds.ts";
 import { publicProcedure, router } from "./trpc.ts";
 import { z } from "zod";
-import { getDCAStrategy, setDCAStrategy } from "./lib/assets/dca-strategy.ts";
+import { Level } from "level";
 
-const kv = await Deno.openKv();
+const db = new Level<string, any>("./db", { valueEncoding: "json" });
+const dcaStrategies = db.sublevel<string, any>("dca-strategies", {
+  valueEncoding: "json",
+});
 
 const appRouter = router({
   getBonds: publicProcedure.query(async () => {
@@ -14,7 +17,7 @@ const appRouter = router({
     id: z.string(),
   })).query(
     async ({ input }) => {
-      return await getDCAStrategy(input.id, kv);
+      return await dcaStrategies.get(input.id);
     },
   ),
   setDCAStrategy: publicProcedure.input(
@@ -27,7 +30,7 @@ const appRouter = router({
     .mutation(
       async ({ input }) => {
         // TODO: Auth
-        return await setDCAStrategy(input, kv);
+        return dcaStrategies.put(input.id, input);
       },
     ),
 });

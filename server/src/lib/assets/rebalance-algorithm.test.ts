@@ -1,7 +1,8 @@
-import { Asset, rebalanceAssets } from "./rebalance-algorithm.ts";
-import { assertEquals } from "jsr:@std/assert";
+import assert from "node:assert";
+import { type Asset, rebalanceAssets } from "./rebalance-algorithm.ts";
+import { it } from "node:test";
 
-Deno.test("rebalanceAssets should correctly rebalance assets", () => {
+it("should correctly rebalance assets", () => {
   const assets: Asset[] = [
     {
       id: "1",
@@ -20,7 +21,7 @@ Deno.test("rebalanceAssets should correctly rebalance assets", () => {
   ];
   const additionalMoney = 1000;
 
-  assertEquals(rebalanceAssets(assets, additionalMoney), [
+  assert.deepStrictEqual(rebalanceAssets(assets, additionalMoney), [
     {
       asset: assets[0],
       needToBuy: 4,
@@ -32,7 +33,7 @@ Deno.test("rebalanceAssets should correctly rebalance assets", () => {
   ]);
 });
 
-Deno.test("rebalanceAssets should handle zero additional money", () => {
+it("should handle zero additional money", () => {
   const assets: Asset[] = [
     {
       id: "1",
@@ -51,7 +52,7 @@ Deno.test("rebalanceAssets should handle zero additional money", () => {
   ];
   const additionalMoney = 0;
 
-  assertEquals(rebalanceAssets(assets, additionalMoney), [
+  assert.deepStrictEqual(rebalanceAssets(assets, additionalMoney), [
     {
       asset: assets[0],
       needToBuy: 0,
@@ -63,14 +64,14 @@ Deno.test("rebalanceAssets should handle zero additional money", () => {
   ]);
 });
 
-Deno.test("rebalanceAssets should handle no assets", () => {
+it("should handle no assets", () => {
   const assets: Asset[] = [];
   const additionalMoney = 1000;
 
-  assertEquals(rebalanceAssets(assets, additionalMoney), []);
+  assert.deepStrictEqual(rebalanceAssets(assets, additionalMoney), []);
 });
 
-Deno.test("rebalanceAssets should handle asset with desired sum less than current sum", () => {
+it("should handle asset with desired sum less than current sum", () => {
   const assets: Asset[] = [
     {
       id: "1",
@@ -89,7 +90,7 @@ Deno.test("rebalanceAssets should handle asset with desired sum less than curren
   ];
   const additionalMoney = 1000;
 
-  assertEquals(rebalanceAssets(assets, additionalMoney), [
+  assert.deepStrictEqual(rebalanceAssets(assets, additionalMoney), [
     {
       asset: assets[0],
       needToBuy: 0,

@@ -3,9 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "dev": "node --experimental-transform-types ./src/main.ts",
-    "test": "node --experimental-transform-types --test"
+    "dev": "npm run start",
+    "test": "node --experimental-transform-types --test",
+    "start": "node --experimental-transform-types ./src/main.ts",
+    "deploy": "node --experimental-transform-types ./scripts/deploy.ts"
   },
   "dependencies": {
     "@trpc/server": "^11.0.0-rc.748",
@@ -16,6 +17,7 @@
     "@types/cors": "^2.8.17",
     "@types/node": "^22.13.1",
     "cors": "^2.8.5",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "zx": "^8.3.2"
   }
 }

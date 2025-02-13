@@ -14,26 +14,27 @@ const appRouter = router({
   getBonds: publicProcedure.query(async () => {
     return await getBonds();
   }),
-  getDCAStrategy: publicProcedure.input(z.object({
-    id: z.string(),
-  })).query(
-    async ({ input }) => {
+  getDCAStrategy: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
       return await dcaStrategies.get(input.id);
-    },
-  ),
-  setDCAStrategy: publicProcedure.input(
-    z.object({
-      id: z.string(),
-      currentMonthBudget: z.number(),
-      assets: z.array(z.object({ isin: z.string(), weight: z.number() })),
     }),
-  )
-    .mutation(
-      async ({ input }) => {
-        // TODO: Auth
-        return dcaStrategies.put(input.id, input);
-      },
-    ),
+  setDCAStrategy: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        currentMonthBudget: z.number(),
+        assets: z.array(z.object({ isin: z.string(), weight: z.number() })),
+      })
+    )
+    .mutation(async ({ input }) => {
+      // TODO: Auth
+      return dcaStrategies.put(input.id, input);
+    }),
 });
 
 const server = createHTTPServer({
@@ -41,6 +42,6 @@ const server = createHTTPServer({
   router: appRouter,
 });
 
-server.listen(3000);
+server.listen(process.env.PORT || 3000);
 
 export type AppRouter = typeof appRouter;

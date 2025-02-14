@@ -1,5 +1,5 @@
 export type DCAStrategyAsset = {
-  isin: string;
+  id: string;
   weight: number;
 };
 
@@ -8,3 +8,5 @@ export type DCAStrategy = {
   currentMonthBudget: number;
   assets: DCAStrategyAsset[];
 };
+
+export const dbKey = "dca_strategies";

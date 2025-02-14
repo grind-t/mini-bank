@@ -1,45 +1,18 @@
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
-import { getBonds } from "./lib/bonds.ts";
-import { publicProcedure, router } from "./trpc.ts";
-import { z } from "zod";
-import { Level } from "level";
+import { router, createContext } from "./common/config/trpc.ts";
 import cors from "cors";
-
-const db = new Level<string, any>("./db", { valueEncoding: "json" });
-const dcaStrategies = db.sublevel<string, any>("dca-strategies", {
-  valueEncoding: "json",
-});
+import { bonds } from "./investments/bonds/trpc.ts";
+import { dcaStrategies } from "./investments/dca-strategy/trpc.ts";
 
 const appRouter = router({
-  getBonds: publicProcedure.query(async () => {
-    return await getBonds();
-  }),
-  getDCAStrategy: publicProcedure
-    .input(
-      z.object({
-        id: z.string(),
-      })
-    )
-    .query(async ({ input }) => {
-      return await dcaStrategies.get(input.id);
-    }),
-  setDCAStrategy: publicProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        currentMonthBudget: z.number(),
-        assets: z.array(z.object({ isin: z.string(), weight: z.number() })),
-      })
-    )
-    .mutation(async ({ input }) => {
-      // TODO: Auth
-      return dcaStrategies.put(input.id, input);
-    }),
+  bonds,
+  dcaStrategies,
 });
 
 const server = createHTTPServer({
   middleware: cors(),
   router: appRouter,
+  createContext,
 });
 
 server.listen(process.env.PORT || 3000);

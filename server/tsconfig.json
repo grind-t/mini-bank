@@ -6,7 +6,9 @@
     "allowImportingTsExtensions": true,
     "rewriteRelativeImportExtensions": true,
     "verbatimModuleSyntax": true,
-    "strict": true
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true
   },
   "include": ["src"]
 }

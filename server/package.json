@@ -6,7 +6,7 @@
     "check": "tsc --noEmit",
     "test": "node --experimental-transform-types --test",
     "start": "node --env-file-if-exists=.env --experimental-transform-types ./src/main.ts",
-    "deploy": "node --experimental-transform-types ./scripts/deploy.ts"
+    "deploy": "node --env-file=.env --experimental-transform-types ./scripts/deploy.ts"
   },
   "dependencies": {
     "@trpc/server": "^11.0.0-rc.748",

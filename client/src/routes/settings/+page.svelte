@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { user } from "$lib/user.svelte";
+  import { user } from "$lib/auth/user.svelte";
 </script>
 
 <label class="input m-2">

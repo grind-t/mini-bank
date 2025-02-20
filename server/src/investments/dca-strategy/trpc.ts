@@ -1,12 +1,15 @@
 import { z } from "zod";
-import { protectedProcedure } from "../../common/config/trpc.ts";
+import {
+  protectedProcedure,
+  publicProcedure,
+} from "../../common/config/trpc.ts";
 import { getDCAStrategy } from "./service/get.ts";
 import { setDCAStrategy } from "./service/set.ts";
 import { TRPCError } from "@trpc/server";
 import { executeDCAStrategy } from "./service/exec.ts";
 
 export const dcaStrategies = {
-  get: protectedProcedure
+  get: publicProcedure
     .input(
       z.object({
         id: z.string(),

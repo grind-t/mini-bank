@@ -1,30 +1,67 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { getBonds } from "$lib/api";
+  import { getBonds, getDCAStrategy, setDCAStrategy } from "$lib/api";
   import { getCurrentMonthName, getDistanceInYearsText } from "$lib/date";
-  import { getBondRatingText } from "$lib/bonds";
+  import { getBondRatingText } from "$lib/bonds/rating";
+
+  let bonds: Awaited<ReturnType<typeof getBonds>>;
+  let dcaStrategy: Awaited<ReturnType<typeof getDCAStrategy>>;
 
   onMount(async () => {
-    //const greetMsg = await invoke("greet", { name: "world" });
-    //console.log(greetMsg);
+    [bonds, dcaStrategy] = await Promise.all([
+      getBonds(),
+      getDCAStrategy({ id: "bonds" }),
+    ]);
+
+    dcaStrategy ??= {
+      id: "bonds",
+      currentMonthBudget: 0,
+      assets: [],
+    };
   });
 </script>
 
-<main class="flex flex-col">
-  <input
-    class="input m-2"
-    type="text"
-    placeholder="Сумма на {getCurrentMonthName()}"
-  />
+<main class="flex flex-col flex-1">
+  {#if bonds && dcaStrategy}
+    <input
+      value={dcaStrategy.currentMonthBudget || ""}
+      class="input m-2"
+      type="text"
+      placeholder="Сумма на {getCurrentMonthName()}"
+      onchange={(e) => {
+        if (!dcaStrategy) return;
 
-  {#await getBonds()}
-    ...
-  {:then bonds}
+        dcaStrategy.currentMonthBudget =
+          Number.parseInt(e.currentTarget.value) || 0;
+        setDCAStrategy(dcaStrategy);
+      }}
+    />
     <ul class="list">
       {#each bonds as bond}
+        {@const assetIdx = dcaStrategy.assets.findIndex(
+          (a) => a.id == bond.isin
+        )}
+
         <li class="list-row">
           <label>
-            <input type="checkbox" class="checkbox checkbox-xs" />
+            <input
+              checked={assetIdx !== -1}
+              type="checkbox"
+              class="checkbox checkbox-xs"
+              onchange={(e) => {
+                if (!dcaStrategy) return;
+
+                const { checked } = e.currentTarget;
+
+                if (checked) {
+                  dcaStrategy?.assets.push({ id: bond.isin, weight: 1 });
+                } else {
+                  dcaStrategy?.assets.splice(assetIdx, 1);
+                }
+
+                setDCAStrategy(dcaStrategy);
+              }}
+            />
           </label>
           <div class="list-col-grow flex">
             <div class="flex-3">{bond.name}</div>
@@ -37,5 +74,5 @@
         </li>
       {/each}
     </ul>
-  {/await}
+  {/if}
 </main>

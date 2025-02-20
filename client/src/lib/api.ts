@@ -1,6 +1,6 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import type { AppRouter } from "../../../server/src/main";
-import { user } from "./user.svelte";
+import { user } from "./auth/user.svelte";
 //     👆 **type-only** import
 
 // Pass AppRouter as generic here. 👇 This lets the `trpc` object know
@@ -9,12 +9,13 @@ const trpc = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
       url: "http://localhost:3000",
-      headers: {
+      headers: () => ({
         Authorization: `Basic ${btoa(`${user.name}:${user.password}`)}`,
-      },
+      }),
     }),
   ],
 });
 
 export const getBonds = trpc.bonds.list.query;
 export const getDCAStrategy = trpc.dcaStrategies.get.query;
+export const setDCAStrategy = trpc.dcaStrategies.set.mutate;

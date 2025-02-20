@@ -11,7 +11,7 @@ const appRouter = router({
 
 const server = createHTTPServer({
   middleware: cors({
-    origin: "https://grind-t.github.io/mini-bank",
+    origin: "https://grind-t.github.io",
     credentials: true,
   }),
   router: appRouter,

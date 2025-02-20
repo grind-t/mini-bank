@@ -7,7 +7,8 @@
     "server"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=client\" \"npm run start --workspace=server\""
+    "dev": "concurrently \"npm run dev --workspace=client\" \"npm run start --workspace=server\"",
+    "deploy": "concurrently \"npm run deploy --workspace=client\" \"npm run deploy --workspace=server\""
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

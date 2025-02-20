@@ -1,6 +1,10 @@
 <script lang="ts">
+  import { base } from "$app/paths";
   import { page } from "$app/state";
   import "../app.css";
+
+  const bondsUrl = `${base}/`;
+  const settingsUrl = `${base}/settings`;
 </script>
 
 <div class="flex flex-col h-full">
@@ -14,16 +18,16 @@
     <a
       role="tab"
       class="tab"
-      href="/"
-      class:tab-active={page.url.pathname === "/"}
+      href={bondsUrl}
+      class:tab-active={page.url.pathname === bondsUrl}
     >
       Облигации
     </a>
     <a
       role="tab"
       class="tab"
-      href="/settings"
-      class:tab-active={page.url.pathname === "/settings"}
+      href={settingsUrl}
+      class:tab-active={page.url.pathname === settingsUrl}
     >
       Настройки
     </a>

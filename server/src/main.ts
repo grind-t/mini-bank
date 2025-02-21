@@ -4,6 +4,8 @@ import cors from "cors";
 import { bonds } from "./investments/bonds/trpc.ts";
 import { dcaStrategies } from "./investments/dca-strategy/trpc.ts";
 
+const dev = process.env.NODE_ENV === "development";
+
 const appRouter = router({
   bonds,
   dcaStrategies,
@@ -11,7 +13,7 @@ const appRouter = router({
 
 const server = createHTTPServer({
   middleware: cors({
-    origin: "https://grind-t.github.io",
+    origin: dev ? /http:\/\/localhost:\d+$/ : "https://grind-t.github.io",
     credentials: true,
   }),
   router: appRouter,

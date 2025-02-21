@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "NODE_ENV=development npm run start",
     "check": "tsc --noEmit",
     "test": "node --experimental-transform-types --test",
     "start": "node --env-file-if-exists=.env --experimental-transform-types ./src/main.ts",

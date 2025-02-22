@@ -1,9 +1,6 @@
 import dayjs from "dayjs";
 import { TinkoffInvestApi } from "tinkoff-invest-api";
-import type {
-  GetLastPricesRequest,
-  GetLastPricesResponse,
-} from "tinkoff-invest-api/cjs/generated/marketdata.js";
+import type { GetLastPricesRequest } from "tinkoff-invest-api/cjs/generated/marketdata.js";
 
 const api = new TinkoffInvestApi({
   token: process.env.T_INVEST_READONLY_TOKEN as string,
@@ -12,9 +9,13 @@ const api = new TinkoffInvestApi({
 export const getPortfolio = api.operations.getPortfolio;
 export const findInstrument = api.instruments.findInstrument;
 export const bondBy = api.instruments.bondBy;
-export const getLastPrices = api.marketdata.getLastPrices as (
+export const getLastPrices = (
   req: Pick<GetLastPricesRequest, "instrumentId">
-) => Promise<GetLastPricesResponse>;
+) =>
+  api.marketdata.getLastPrices({
+    ...(req as GetLastPricesRequest),
+    figi: [],
+  });
 
 export async function getCurrentMonthTradingDays() {
   const today = dayjs();

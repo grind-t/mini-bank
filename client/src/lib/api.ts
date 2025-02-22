@@ -24,3 +24,4 @@ const trpc = createTRPCClient<AppRouter>({
 export const getBonds = trpc.bonds.list.query;
 export const getDCAStrategy = trpc.dcaStrategies.get.query;
 export const setDCAStrategy = trpc.dcaStrategies.set.mutate;
+export const executeDCAStrategy = trpc.dcaStrategies.execute.mutate;

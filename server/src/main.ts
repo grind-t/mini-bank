@@ -20,6 +20,6 @@ const server = createHTTPServer({
   createContext,
 });
 
-server.listen(process.env.PORT || 3000);
+server.listen(process.env.PORT);
 
 export type AppRouter = typeof appRouter;

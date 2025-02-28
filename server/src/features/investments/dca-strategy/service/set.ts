@@ -1,4 +1,4 @@
-import { redis } from "../../../../redis.ts";
+import { redis } from "#src/redis.ts";
 import { dbKey, type DCAStrategy } from "../model.ts";
 
 export async function setDCAStrategy(value: DCAStrategy): Promise<void> {

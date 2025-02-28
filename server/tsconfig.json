@@ -9,9 +9,8 @@
     "noEmit": true,
     "skipLibCheck": true,
     "paths": {
-      "#features/*": ["./src/features/*"],
-      "#redis": ["./src/redis"],
-      "#trpc": ["./src/trpc"]
+      "#src/*": ["./src/*"],
+      "#features/*": ["./src/features/*"]
     }
   },
   "include": ["src"]

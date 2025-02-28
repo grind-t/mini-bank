@@ -3,14 +3,13 @@
   "private": true,
   "type": "module",
   "imports": {
-    "#features/*": "./src/features/*",
-    "#redis": "./src/redis.ts",
-    "#trpc": "./src/trpc.ts"
+    "#src/*": "./src/*",
+    "#features/*": "./src/features/*"
   },
   "scripts": {
     "dev": "node --env-file=.env --experimental-transform-types ./src/main.ts",
     "check": "tsc --noEmit",
-    "test": "node --experimental-transform-types --test",
+    "test": "node  --env-file=.env --experimental-transform-types --experimental-test-module-mocks --test",
     "start": "node --experimental-transform-types ./src/main.ts",
     "deploy": "node --env-file=.env --experimental-transform-types ./scripts/deploy.ts"
   },

@@ -1,8 +1,5 @@
 import { z } from "zod";
-import {
-  protectedProcedure,
-  publicProcedure,
-} from "../../common/config/trpc.ts";
+import { protectedProcedure, publicProcedure } from "../../../trpc.ts";
 import { getDCAStrategy } from "./service/get.ts";
 import { setDCAStrategy } from "./service/set.ts";
 import { TRPCError } from "@trpc/server";

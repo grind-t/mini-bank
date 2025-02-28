@@ -1,8 +1,8 @@
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
-import { router, createContext } from "./common/config/trpc.ts";
+import { router, createContext } from "./trpc.ts";
 import cors from "cors";
-import { bonds } from "./investments/bonds/trpc.ts";
-import { dcaStrategies } from "./investments/dca-strategy/trpc.ts";
+import { bonds } from "./features/investments/bonds/trpc.ts";
+import { dcaStrategies } from "./features/investments/dca-strategy/trpc.ts";
 
 const dev = process.env.NODE_ENV === "development";
 

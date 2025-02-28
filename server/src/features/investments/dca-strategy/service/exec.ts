@@ -1,4 +1,4 @@
-import { getCurrentMonthTradingDays } from "../../../common/integrations/t-invest-api.ts";
+import { getCurrentMonthTradingDays } from "#features/investments/t-invest-api-integration/service/getCurrentMonthTradingDays.ts";
 import { rebalanceInvestAccount } from "../../accounts/helpers/rebalance.ts";
 import type { InvestAccountAsset } from "../../accounts/model.ts";
 import { getInvestAccountFromTInvestAPI } from "../../accounts/service/getFromTInvestAPI.ts";

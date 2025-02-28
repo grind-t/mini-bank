@@ -4,11 +4,15 @@
     "target": "esnext",
     "module": "NodeNext",
     "allowImportingTsExtensions": true,
-    "rewriteRelativeImportExtensions": true,
     "verbatimModuleSyntax": true,
     "strict": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "#features/*": ["./src/features/*"],
+      "#redis": ["./src/redis"],
+      "#trpc": ["./src/trpc"]
+    }
   },
   "include": ["src"]
 }

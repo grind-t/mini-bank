@@ -1,11 +1,11 @@
 import { Helpers } from "tinkoff-invest-api";
-import { getPortfolio } from "../../../common/integrations/t-invest-api.ts";
 import type { InvestAccount } from "../model.ts";
+import tInvestApi from "#features/investments/t-invest-api-integration/core.ts";
 
 export async function getInvestAccountFromTInvestAPI(
   accountId: string
 ): Promise<InvestAccount> {
-  const portfolio = await getPortfolio({ accountId });
+  const portfolio = await tInvestApi.operations.getPortfolio({ accountId });
 
   return {
     id: portfolio.accountId,

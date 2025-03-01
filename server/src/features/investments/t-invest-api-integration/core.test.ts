@@ -9,31 +9,46 @@ import {
 } from "tinkoff-invest-api/cjs/generated/orders.js";
 import { PriceType } from "tinkoff-invest-api/cjs/generated/common.js";
 import assert from "node:assert";
+import { tmonFundId } from "./service/repo.ts";
 
 it("should make post order", async (t) => {
   let response: PostOrderResponse;
 
+  const testAccount = await tInvestApi.sandbox.openSandboxAccount({
+    name: "t-invest-integration-test",
+  });
+
   try {
+    await tInvestApi.sandbox.sandboxPayIn({
+      accountId: testAccount.accountId,
+      amount: {
+        currency: "RUB",
+        units: 10000,
+        nano: 0,
+      },
+    });
+
     response = await tInvestApi.sandbox.postOrder({
       quantity: 1,
       direction: OrderDirection.ORDER_DIRECTION_BUY,
-      accountId: "d68d9cca-793d-456c-a77d-1dcd955dd42e",
+      accountId: testAccount.accountId,
       orderType: OrderType.ORDER_TYPE_MARKET,
       orderId: crypto.randomUUID(),
-      instrumentId: "ade12bc5-07d9-44fe-b27a-1543e05bacfd",
+      instrumentId: tmonFundId,
       timeInForce: TimeInForceType.TIME_IN_FORCE_UNSPECIFIED,
       priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
     });
   } catch (e: any) {
     return t.skip(e?.message);
+  } finally {
+    tInvestApi.sandbox.closeSandboxAccount({
+      accountId: testAccount.accountId,
+    });
   }
 
   assert.strictEqual(response.direction, OrderDirection.ORDER_DIRECTION_BUY);
   assert.strictEqual(response.orderType, OrderType.ORDER_TYPE_MARKET);
-  assert.strictEqual(
-    response.instrumentUid,
-    "ade12bc5-07d9-44fe-b27a-1543e05bacfd"
-  );
+  assert.strictEqual(response.instrumentUid, tmonFundId);
   assert.strictEqual(
     response.executionReportStatus,
     OrderExecutionReportStatus.EXECUTION_REPORT_STATUS_FILL

@@ -1,48 +1,33 @@
-import type { getInvestAccountFromTInvestAPI } from "#features/investments/accounts/service/getFromTInvestAPI.ts";
 import tInvestApi from "#features/investments/t-invest-api-integration/core.ts";
-import type { getCurrentMonthTradingDays } from "#features/investments/t-invest-api-integration/service/trading-days.ts";
 import { it } from "node:test";
-import { Helpers } from "tinkoff-invest-api";
+import assert from "node:assert";
+import type { getCurrentMonthTradingDays } from "#features/investments/t-invest-api-integration/service/trading-days.ts";
 import type { logDCAStrategy } from "./log.ts";
 
 it("should correctly exec dca-strategy", async (t) => {
-  const getInvestAccountFromTInvestAPIMock = t.mock.fn<
-    typeof getInvestAccountFromTInvestAPI
-  >(undefined, async (accountId) => {
-    const portfolio = await tInvestApi.sandbox.getSandboxPortfolio({
-      accountId,
-    });
+  t.mock.method(
+    tInvestApi.operations,
+    "getPortfolio",
+    tInvestApi.sandbox.getSandboxPortfolio
+  );
 
-    return {
-      id: portfolio.accountId,
-      assets: portfolio.positions.map((position) => ({
-        id: position.instrumentUid,
-        quantity: Helpers.toNumber(position.quantity) || 0,
-        currentPrice: Helpers.toNumber(position.currentPrice) || 0,
-        averagePrice: Helpers.toNumber(position.averagePositionPrice) || 0,
-      })),
-    };
-  });
-
-  const getCurrentMonthTradingDaysMock = t.mock.fn<
-    typeof getCurrentMonthTradingDays
-  >(undefined, async () => 10);
-
-  const postOrderMock = t.mock.fn<typeof tInvestApi.orders.postOrder>(
-    undefined,
+  const postOrderMock = t.mock.method(
+    tInvestApi.orders,
+    "postOrder",
     tInvestApi.sandbox.postOrder
   );
 
-  const logDCAStrategyMock = t.mock.fn<typeof logDCAStrategy>(
-    undefined,
-    async () => {}
+  t.mock.method(
+    tInvestApi.orders,
+    "getOrderState",
+    tInvestApi.sandbox.getSandboxOrderState
   );
 
-  t.mock.module("#features/investments/accounts/service/getFromTInvestAPI.ts", {
-    namedExports: {
-      getInvestAccountFromTInvestAPI: getInvestAccountFromTInvestAPIMock,
-    },
-  });
+  const getCurrentMonthTradingDaysMock = t.mock.fn<
+    typeof getCurrentMonthTradingDays
+  >(async () => 10);
+
+  const logDCAStrategyMock = t.mock.fn<typeof logDCAStrategy>(async () => {});
 
   t.mock.module(
     "#features/investments/t-invest-api-integration/service/trading-days.ts",
@@ -53,23 +38,14 @@ it("should correctly exec dca-strategy", async (t) => {
     }
   );
 
-  t.mock.module("#features/investments/t-invest-api-integration/core.ts", {
-    defaultExport: {
-      ...tInvestApi,
-      orders: {
-        ...tInvestApi.orders,
-        postOrder: postOrderMock,
-      },
-    },
-  });
-
   t.mock.module("./log.ts", {
     namedExports: { logDCAStrategy: logDCAStrategyMock },
   });
 
-  const { transferFromREPO, transferToREPO } = await import(
-    "#features/investments/t-invest-api-integration/service/repo.ts"
-  );
+  const [{ transferToREPO }, { executeDCAStrategy }] = await Promise.all([
+    import("#features/investments/t-invest-api-integration/service/repo.ts"),
+    import("./exec.ts"),
+  ]);
 
   const testAccount = await tInvestApi.sandbox.openSandboxAccount({
     name: "dca-strategy-test",
@@ -80,30 +56,41 @@ it("should correctly exec dca-strategy", async (t) => {
       accountId: testAccount.accountId,
       amount: {
         currency: "RUB",
-        units: 20000,
+        units: 110000,
         nano: 0,
       },
     });
 
-    await transferToREPO(testAccount.accountId, 15000);
-    await transferFromREPO(testAccount.accountId, 10000);
+    await transferToREPO(testAccount.accountId, 105000);
 
-    /*await executeDCAStrategy(
-      {
-        id: "test-dca-strategy",
-        currentMonthBudget: 10000,
-        assets: [
-          { id: "test-asset-1", weight: 1 },
-          { id: "test-asset-2", weight: 3 },
-        ],
-      },
-      testAccount.accountId
-    );*/
+    postOrderMock.mock.mockImplementation((() => {}) as any);
+    postOrderMock.mock.mockImplementationOnce(tInvestApi.sandbox.postOrder);
+
+    const strategy = {
+      id: "test-dca-strategy",
+      currentMonthBudget: 100000,
+      assets: [
+        { id: "92b9e913-d7df-4164-bd83-1013c819bf44", weight: 1 },
+        { id: "9b933bc0-bc9c-46c3-8be0-d15249b81408", weight: 3 },
+      ],
+    };
+
+    await executeDCAStrategy(strategy, testAccount.accountId);
   } catch (e: any) {
     return t.skip(e?.message);
   } finally {
-    await tInvestApi.sandbox.closeSandboxAccount({
+    tInvestApi.sandbox.closeSandboxAccount({
       accountId: testAccount.accountId,
     });
   }
+
+  const { rebalancedAssets } = logDCAStrategyMock.mock.calls[0].arguments[0];
+  const ratio1 =
+    (rebalancedAssets[0].quantity * rebalancedAssets[0].currentPrice) / 10000;
+  const ratio2 =
+    (rebalancedAssets[1].quantity * rebalancedAssets[1].currentPrice) / 10000;
+
+  assert.strictEqual(logDCAStrategyMock.mock.callCount(), 1);
+  assert(ratio1 <= 0.25 && ratio1 >= 0.2);
+  assert(ratio2 <= 0.75 && ratio2 >= 0.7);
 });

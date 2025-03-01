@@ -56,16 +56,18 @@ export async function executeDCAStrategy(
   for (let i = 0; i < assets.length; i++) {
     const quantity = rebalancedAssets[i].quantity - assets[i].quantity;
 
-    tInvestApi.orders.postOrder({
-      quantity,
-      direction: OrderDirection.ORDER_DIRECTION_BUY,
-      accountId,
-      orderType: OrderType.ORDER_TYPE_MARKET,
-      orderId: crypto.randomUUID(),
-      instrumentId: assets[i].id,
-      timeInForce: TimeInForceType.TIME_IN_FORCE_UNSPECIFIED,
-      priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
-    });
+    if (quantity > 0) {
+      tInvestApi.orders.postOrder({
+        quantity,
+        direction: OrderDirection.ORDER_DIRECTION_BUY,
+        accountId,
+        orderType: OrderType.ORDER_TYPE_MARKET,
+        orderId: crypto.randomUUID(),
+        instrumentId: assets[i].id,
+        timeInForce: TimeInForceType.TIME_IN_FORCE_UNSPECIFIED,
+        priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
+      });
+    }
   }
 
   logDCAStrategy({

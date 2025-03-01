@@ -9,7 +9,7 @@ import {
 import { PriceType } from "tinkoff-invest-api/cjs/generated/common.js";
 import { isOrderFilled, pollOrderState } from "./order-state.ts";
 
-const lqdtFundId = "ade12bc5-07d9-44fe-b27a-1543e05bacfd";
+export const tmonFundId = "498ec3ff-ef27-4729-9703-a5aac48d5789";
 
 async function transfer(
   accountId: string,
@@ -17,7 +17,7 @@ async function transfer(
   direction: OrderDirection
 ) {
   const priceResponse = await tInvestApi.marketData.getLastPrices({
-    instrumentId: [lqdtFundId],
+    instrumentId: [tmonFundId],
   });
 
   const price = priceResponse.lastPrices[0]?.price;
@@ -34,7 +34,7 @@ async function transfer(
     accountId,
     orderType: OrderType.ORDER_TYPE_MARKET,
     orderId: crypto.randomUUID(),
-    instrumentId: lqdtFundId,
+    instrumentId: tmonFundId,
     timeInForce: TimeInForceType.TIME_IN_FORCE_UNSPECIFIED,
     priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
   });

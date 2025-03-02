@@ -1,1 +1,0 @@
-import{n as o}from"./pJXrdxYV.js";import{p as r}from"./VyCi3U95.js";const s=r({name:"admin",password:localStorage.getItem("password")||""});o(()=>{localStorage.setItem("password",s.password)});export{s as u};

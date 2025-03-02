@@ -5,6 +5,7 @@
 
   const bondsUrl = `${base}/`;
   const settingsUrl = `${base}/settings`;
+  const logsUrl = `${base}/logs`;
 </script>
 
 <div class="flex flex-col h-full">
@@ -30,6 +31,14 @@
       class:tab-active={page.url.pathname === settingsUrl}
     >
       Настройки
+    </a>
+    <a
+      role="tab"
+      class="tab"
+      href={logsUrl}
+      class:tab-active={page.url.pathname === logsUrl}
+    >
+      Логи
     </a>
   </div>
 </div>

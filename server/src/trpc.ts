@@ -1,5 +1,6 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone";
+import SuperJSON from "superjson";
 
 export const createContext = (opts: CreateHTTPContextOptions) => {
   const credentials = opts.req.headers.authorization?.split(" ")[1] || "";
@@ -14,7 +15,9 @@ export const createContext = (opts: CreateHTTPContextOptions) => {
 };
 export type Context = Awaited<ReturnType<typeof createContext>>;
 
-const t = initTRPC.context<Context>().create();
+const t = initTRPC.context<Context>().create({
+  transformer: SuperJSON,
+});
 
 export const router = t.router;
 export const publicProcedure = t.procedure;

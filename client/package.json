@@ -22,6 +22,8 @@
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
     "@trpc/client": "^11.0.0-rc.747",
+    "dayjs": "^1.11.13",
+    "superjson": "^2.2.2",
     "tailwindcss": "^4.0.0"
   },
   "devDependencies": {

@@ -1,6 +1,7 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import type { AppRouter } from "../../../server/src/main";
 import { user } from "./auth/user.svelte";
+import SuperJSON from "superjson";
 
 const trpc = createTRPCClient<AppRouter>({
   links: [
@@ -17,6 +18,7 @@ const trpc = createTRPCClient<AppRouter>({
           credentials: "include",
         });
       },
+      transformer: SuperJSON,
     }),
   ],
 });
@@ -25,3 +27,4 @@ export const getBonds = trpc.bonds.list.query;
 export const getDCAStrategy = trpc.dcaStrategies.get.query;
 export const setDCAStrategy = trpc.dcaStrategies.set.mutate;
 export const executeDCAStrategy = trpc.dcaStrategies.execute.mutate;
+export const getDCAStrategyLogs = trpc.dcaStrategies.logs.query;

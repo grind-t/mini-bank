@@ -1,6 +1,9 @@
 <script lang="ts">
   import { executeDCAStrategy } from "$lib/api";
   import { user } from "$lib/auth/user.svelte";
+
+  let executeDCAStrategyPromise =
+    $state<ReturnType<typeof executeDCAStrategy>>();
 </script>
 
 <div class="flex flex-col h-full">
@@ -51,14 +54,20 @@
   </label>
 
   <button
-    class="btn btn-primary m-2"
+    class="btn btn-primary mt-auto mb-2 mx-2"
     onclick={() => {
-      executeDCAStrategy({
+      executeDCAStrategyPromise = executeDCAStrategy({
         strategyId: "bonds",
         accountId: user.tInvestAccountId,
       });
     }}
   >
-    Запустить DCA
+    {#await executeDCAStrategyPromise}
+      <span class="loading loading-ring"></span>
+    {:then _}
+      Запустить DCA
+    {:catch e}
+      {e?.message}
+    {/await}
   </button>
 </div>

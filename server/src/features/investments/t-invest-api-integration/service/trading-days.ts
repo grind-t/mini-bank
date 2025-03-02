@@ -1,13 +1,19 @@
 import dayjs from "dayjs";
-import tInvestApi from "../core.ts";
 
 export async function getCurrentMonthTradingDays() {
-  const today = dayjs();
-  const endOfMonth = today.endOf("month");
-  const schedule = await tInvestApi.instruments.tradingSchedules({
-    exchange: "MOEX",
-    from: today.toDate(),
-    to: endOfMonth.toDate(),
-  });
-  return schedule.exchanges[0].days.filter((day) => day.isTradingDay).length;
+  const startOfMonth = dayjs().startOf("month");
+  const endOfMonth = dayjs().endOf("month");
+  let workingDays = 0;
+
+  for (
+    let day = startOfMonth;
+    day.isBefore(endOfMonth) || day.isSame(endOfMonth, "day");
+    day = day.add(1, "day")
+  ) {
+    if (day.day() !== 0 && day.day() !== 6) {
+      workingDays++;
+    }
+  }
+
+  return workingDays;
 }

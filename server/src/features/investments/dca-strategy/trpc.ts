@@ -4,6 +4,7 @@ import { getDCAStrategy } from "./service/get.ts";
 import { setDCAStrategy } from "./service/set.ts";
 import { TRPCError } from "@trpc/server";
 import { executeDCAStrategy } from "./service/exec.ts";
+import { getDCAStrategyLogs } from "./service/get-logs.ts";
 
 export const dcaStrategies = {
   get: publicProcedure
@@ -39,5 +40,10 @@ export const dcaStrategies = {
       }
 
       await executeDCAStrategy(strategy, input.accountId);
+    }),
+  logs: publicProcedure
+    .input(z.object({ id: z.string(), from: z.date(), to: z.date() }))
+    .query(async ({ input }) => {
+      return await getDCAStrategyLogs(input.id, input.from, input.to);
     }),
 };

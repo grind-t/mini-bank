@@ -11,7 +11,7 @@ import type { InvestAccountAsset } from "../../accounts/model.ts";
 import { getInvestAccountFromTInvestAPI } from "../../accounts/service/getFromTInvestAPI.ts";
 import { getAssetsFromTInvestApi } from "../../assets/service/getFromTInvestAPI.ts";
 import { getDCAStrategyAssetsRatios } from "../helpers/getAssetsRatio.ts";
-import type { DCAStrategy } from "../model.ts";
+import type { DCAStrategy } from "../model/dca-strategy.ts";
 import { PriceType } from "tinkoff-invest-api/cjs/generated/common.js";
 import { logDCAStrategy } from "./log.ts";
 

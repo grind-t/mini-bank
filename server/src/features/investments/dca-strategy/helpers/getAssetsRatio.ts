@@ -1,4 +1,4 @@
-import type { DCAStrategyAsset } from "../model.ts";
+import type { DCAStrategyAsset } from "../model/dca-strategy.ts";
 
 export function getDCAStrategyAssetsRatios(
   assets: DCAStrategyAsset[]

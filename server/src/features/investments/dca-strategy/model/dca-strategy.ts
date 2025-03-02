@@ -9,4 +9,4 @@ export type DCAStrategy = {
   assets: DCAStrategyAsset[];
 };
 
-export const dbKey = "dca_strategies";
+export const dcaStrategiesKey = "dca_strategies";

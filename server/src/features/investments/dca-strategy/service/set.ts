@@ -1,10 +1,10 @@
 import { redis } from "#src/redis.ts";
-import { dbKey, type DCAStrategy } from "../model.ts";
+import { dcaStrategiesKey, type DCAStrategy } from "../model/dca-strategy.ts";
 
 export async function setDCAStrategy(value: DCAStrategy): Promise<void> {
   await redis
     .multi()
-    .set(`${dbKey}:${value.id}`, JSON.stringify(value))
-    .sadd(dbKey, value.id)
+    .set(`${dcaStrategiesKey}:${value.id}`, JSON.stringify(value))
+    .sadd(dcaStrategiesKey, value.id)
     .exec();
 }

@@ -6,12 +6,12 @@
 <div class="flex flex-col h-full">
   {#await getDCAStrategyLogs({ id: "bonds", from: dayjs()
       .subtract(1, "week")
-      .toDate(), to: dayjs().toDate() })}
-    <div class="skeleton w-full, h-32"></div>
-  {:then logs}
-    <div class="mockup-code">
+      .toDate(), to: dayjs().toDate() }) then logs}
+    <div class="mockup-code w-full h-full rounded-none bg-transparent">
       {#each logs as log}
         <pre><code>{JSON.stringify(log, null, 2)}</code></pre>
+      {:else}
+        <pre><code>Логи отсутсвуют</code></pre>
       {/each}
     </div>
   {:catch}

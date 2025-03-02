@@ -4,6 +4,7 @@ import { getCurrentMonthTradingDays } from "#features/investments/t-invest-api-i
 import {
   OrderDirection,
   OrderType,
+  PostOrderResponse,
   TimeInForceType,
 } from "tinkoff-invest-api/cjs/generated/orders.js";
 import { rebalanceInvestAccount } from "../../accounts/helpers/rebalance.ts";
@@ -52,28 +53,34 @@ export async function executeDCAStrategy(
   const [assets, budget] = await Promise.all([assetsPromise, budgetPromise]);
   const targetRatios = getDCAStrategyAssetsRatios(strategy.assets);
   const rebalancedAssets = rebalanceInvestAccount(assets, targetRatios, budget);
+  const orders: Promise<PostOrderResponse>[] = [];
 
   for (let i = 0; i < assets.length; i++) {
     const quantity = rebalancedAssets[i].quantity - assets[i].quantity;
 
     if (quantity > 0) {
-      tInvestApi.orders.postOrder({
-        quantity,
-        direction: OrderDirection.ORDER_DIRECTION_BUY,
-        accountId,
-        orderType: OrderType.ORDER_TYPE_MARKET,
-        orderId: crypto.randomUUID(),
-        instrumentId: assets[i].id,
-        timeInForce: TimeInForceType.TIME_IN_FORCE_UNSPECIFIED,
-        priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
-      });
+      orders.push(
+        tInvestApi.orders.postOrder({
+          quantity,
+          direction: OrderDirection.ORDER_DIRECTION_BUY,
+          accountId,
+          orderType: OrderType.ORDER_TYPE_MARKET,
+          orderId: crypto.randomUUID(),
+          instrumentId: assets[i].id,
+          timeInForce: TimeInForceType.TIME_IN_FORCE_UNSPECIFIED,
+          priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
+        })
+      );
     }
   }
+
+  const results = await Promise.all(orders);
 
   logDCAStrategy({
     strategy,
     initialAssets: assets,
     budget,
     rebalancedAssets,
+    orderIds: results.map((v) => v.orderId),
   });
 }

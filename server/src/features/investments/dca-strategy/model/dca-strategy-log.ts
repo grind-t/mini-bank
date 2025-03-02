@@ -6,6 +6,7 @@ export type DCAStrategyLogPayload = {
   initialAssets: InvestAccountAsset[];
   budget: number;
   rebalancedAssets: InvestAccountAsset[];
+  orderIds: string[];
 };
 
 export type DCAStrategyLog = DCAStrategyLogPayload & { timestamp: number };

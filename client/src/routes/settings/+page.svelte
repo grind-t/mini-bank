@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { executeDCAStrategy } from "$lib/api";
+  import { executeDCAStrategy } from "$lib/common/api";
   import { user } from "$lib/auth/user.svelte";
+  import Timeout from "$lib/common/components/Timeout.svelte";
+  import Toast from "$lib/common/components/Toast.svelte";
 
   let executeDCAStrategyPromise =
     $state<ReturnType<typeof executeDCAStrategy>>();
@@ -67,7 +69,9 @@
     {:then _}
       Запустить DCA
     {:catch e}
-      {e?.message}
+      <Toast class="alert alert-error">
+        {e?.message}
+      </Toast>
     {/await}
   </button>
 </div>

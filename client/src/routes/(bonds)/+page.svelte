@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { getBonds, getDCAStrategy, setDCAStrategy } from "$lib/api";
-  import { getCurrentMonthName, getDistanceInYearsText } from "$lib/date";
+  import { getBonds, getDCAStrategy, setDCAStrategy } from "$lib/common/api";
+  import {
+    getCurrentMonthName,
+    getDistanceInYearsText,
+  } from "$lib/common/date";
   import { getBondRatingText } from "$lib/bonds/rating";
 
   let bonds: Awaited<ReturnType<typeof getBonds>>;

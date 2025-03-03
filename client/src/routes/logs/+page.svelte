@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getDCAStrategyLogs } from "$lib/api";
+  import { getDCAStrategyLogs } from "$lib/common/api";
   import dayjs from "dayjs";
 </script>
 

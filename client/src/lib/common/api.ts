@@ -1,6 +1,6 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "../../../server/src/main";
-import { user } from "./auth/user.svelte";
+import type { AppRouter } from "../../../../server/src/main";
+import { user } from "$lib/auth/user.svelte";
 import SuperJSON from "superjson";
 
 const trpc = createTRPCClient<AppRouter>({

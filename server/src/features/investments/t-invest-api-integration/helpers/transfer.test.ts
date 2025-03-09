@@ -41,7 +41,7 @@ describe("getPositionBalance", () => {
 
 describe("getTransferQuantity", () => {
   it("should calculate max quantity within constraints", () => {
-    assert.strictEqual(getTransferQuantity(1000, 100, 500, 1000), 10);
+    assert.strictEqual(getTransferQuantity(1000, 100, 500, 1000), 5);
   });
 
   it("should use maxSum when lower than balance", () => {
@@ -51,7 +51,7 @@ describe("getTransferQuantity", () => {
   it("should throw if balance less than minSum", () => {
     assert.throws(
       () => getTransferQuantity(300, 100, 500),
-      /Not enough money for transfer/
+      /Invalid transfer constraints/
     );
   });
 
@@ -76,7 +76,7 @@ describe("getTransferQuantity", () => {
     // 400 < 600, so it should throw
     assert.throws(
       () => getTransferQuantity(400, 300, 500),
-      /Not enough money for transfer/
+      /Invalid transfer constraints/
     );
   });
 });

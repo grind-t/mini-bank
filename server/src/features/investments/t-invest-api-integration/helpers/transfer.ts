@@ -21,18 +21,17 @@ export function getPositionBalance(
 export function getTransferQuantity(
   balance: number,
   price: number,
-  minSum = 0,
-  maxSum = Infinity
+  minSum?: number,
+  maxSum?: number
 ): number {
-  const minQuantity = Math.ceil(minSum / price);
-  const maxQuantity = Math.floor(Math.min(balance, maxSum) / price);
-  const actualMinSum = minQuantity * price;
+  const minQuantity = Math.ceil((minSum || 0) / price);
+  const maxQuantity = Math.floor(Math.min(balance, maxSum || Infinity) / price);
 
-  if (balance < actualMinSum) {
+  if (minQuantity > maxQuantity) {
     throw new Error(
-      `Not enough money for transfer (balance: ${balance}, minSum: ${actualMinSum})`
+      `Invalid transfer constraints (balance: ${balance}, price: ${price}, minSum: ${minSum}, maxSum: ${maxSum})`
     );
   }
 
-  return maxQuantity;
+  return minSum ? minQuantity : maxQuantity;
 }

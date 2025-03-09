@@ -26,8 +26,8 @@ export const tmonFundId = "498ec3ff-ef27-4729-9703-a5aac48d5789";
 export async function repoTransfer({
   accountId,
   direction,
-  minSum = 0,
-  maxSum = Infinity,
+  minSum,
+  maxSum,
 }: RepoTransferParams) {
   const pricePromise = tInvestApi.marketData
     .getLastPrices({

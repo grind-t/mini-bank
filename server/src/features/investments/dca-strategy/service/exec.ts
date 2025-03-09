@@ -15,6 +15,8 @@ import type { DCAStrategy } from "../model/dca-strategy.ts";
 import { PriceType } from "tinkoff-invest-api/cjs/generated/common.js";
 import { logDCAStrategy } from "./log.ts";
 import { mergeAccountAssets } from "../../assets/helpers/merge-account-assets.ts";
+import { Helpers } from "tinkoff-invest-api";
+import { setDCAStrategy } from "./set.ts";
 
 export async function executeDCAStrategy(
   strategy: DCAStrategy,
@@ -65,10 +67,23 @@ export async function executeDCAStrategy(
 
   const results = await Promise.all(orders);
 
+  const spent = results.reduce(
+    (acc, v) => acc + (Helpers.toNumber(v.totalOrderAmount) || 0),
+    0
+  );
+
+  repoTransfer({ accountId, direction: OrderDirection.ORDER_DIRECTION_BUY });
+
+  setDCAStrategy({
+    ...strategy,
+    currentMonthBudget: strategy.currentMonthBudget - spent,
+  });
+
   logDCAStrategy({
     strategy,
     initialAssets: assets,
     budget,
+    spent,
     rebalancedAssets,
     orderIds: results.map((v) => v.orderId),
   });

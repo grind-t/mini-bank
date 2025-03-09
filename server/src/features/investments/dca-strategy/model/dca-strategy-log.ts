@@ -5,6 +5,7 @@ export type DCAStrategyLogPayload = {
   strategy: DCAStrategy;
   initialAssets: InvestAccountAsset[];
   budget: number;
+  spent: number;
   rebalancedAssets: InvestAccountAsset[];
   orderIds: string[];
 };

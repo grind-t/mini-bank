@@ -3,6 +3,7 @@ import { it } from "node:test";
 import assert from "node:assert";
 import type { getCurrentMonthTradingDays } from "#features/investments/t-invest-api-integration/service/trading-days.ts";
 import type { logDCAStrategy } from "./log.ts";
+import { OrderDirection } from "tinkoff-invest-api/cjs/generated/orders.js";
 
 it("should correctly exec dca-strategy", async (t) => {
   t.mock.method(
@@ -42,7 +43,7 @@ it("should correctly exec dca-strategy", async (t) => {
     namedExports: { logDCAStrategy: logDCAStrategyMock },
   });
 
-  const [{ transferToREPO }, { executeDCAStrategy }] = await Promise.all([
+  const [{ repoTransfer }, { executeDCAStrategy }] = await Promise.all([
     import("#features/investments/t-invest-api-integration/service/repo.ts"),
     import("./exec.ts"),
   ]);
@@ -61,7 +62,11 @@ it("should correctly exec dca-strategy", async (t) => {
       },
     });
 
-    await transferToREPO(testAccount.accountId, 105000);
+    await repoTransfer({
+      accountId: testAccount.accountId,
+      direction: OrderDirection.ORDER_DIRECTION_BUY,
+      minSum: 100000,
+    });
 
     postOrderMock.mock.mockImplementation((() => {}) as any);
     postOrderMock.mock.mockImplementationOnce(tInvestApi.sandbox.postOrder);

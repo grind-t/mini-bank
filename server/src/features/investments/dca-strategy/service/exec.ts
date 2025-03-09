@@ -1,5 +1,5 @@
 import tInvestApi from "#features/investments/t-invest-api-integration/core.ts";
-import { transferFromREPO } from "#features/investments/t-invest-api-integration/service/repo.ts";
+import { repoTransfer } from "#features/investments/t-invest-api-integration/service/repo.ts";
 import { getCurrentMonthTradingDays } from "#features/investments/t-invest-api-integration/service/trading-days.ts";
 import {
   OrderDirection,
@@ -8,13 +8,13 @@ import {
   TimeInForceType,
 } from "tinkoff-invest-api/cjs/generated/orders.js";
 import { rebalanceInvestAccount } from "../../accounts/helpers/rebalance.ts";
-import type { InvestAccountAsset } from "../../accounts/model.ts";
-import { getInvestAccountFromTInvestAPI } from "../../accounts/service/getFromTInvestAPI.ts";
-import { getAssetsFromTInvestApi } from "../../assets/service/getFromTInvestAPI.ts";
+import { getInvestAccountFromTInvestAPI } from "../../accounts/service/get-from-tinvest-api.ts";
+import { getAssetsFromTInvestApi } from "../../assets/service/get-from-tinvest-api.ts";
 import { getDCAStrategyAssetsRatios } from "../helpers/getAssetsRatio.ts";
 import type { DCAStrategy } from "../model/dca-strategy.ts";
 import { PriceType } from "tinkoff-invest-api/cjs/generated/common.js";
 import { logDCAStrategy } from "./log.ts";
+import { mergeAccountAssets } from "../../assets/helpers/merge-account-assets.ts";
 
 export async function executeDCAStrategy(
   strategy: DCAStrategy,
@@ -23,28 +23,17 @@ export async function executeDCAStrategy(
   const assetsPromise = Promise.all([
     getInvestAccountFromTInvestAPI(accountId),
     getAssetsFromTInvestApi(strategy.assets.map((v) => v.id)),
-  ]).then(([account, assets]) => {
-    const accountAssets = account.assets.reduce((record, asset) => {
-      record[asset.id] = asset;
-      return record;
-    }, {} as Record<string, InvestAccountAsset | undefined>);
-
-    return assets.map<InvestAccountAsset>((asset) => {
-      const accountAsset = accountAssets[asset.id];
-
-      return {
-        id: asset.id,
-        quantity: accountAsset?.quantity || 0,
-        currentPrice: asset.currentPrice,
-        averagePrice: accountAsset?.averagePrice || 0,
-      };
-    });
-  });
+  ]).then(([account, assets]) => mergeAccountAssets(assets, account.assets));
 
   const budgetPromise = getCurrentMonthTradingDays().then(
     async (tradingDays) => {
       const budget = strategy.currentMonthBudget / tradingDays;
-      await transferFromREPO(accountId, budget);
+
+      await repoTransfer({
+        accountId,
+        direction: OrderDirection.ORDER_DIRECTION_SELL,
+        minSum: budget,
+      });
 
       return budget;
     }

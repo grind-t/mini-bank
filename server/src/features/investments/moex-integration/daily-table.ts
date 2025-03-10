@@ -1,4 +1,4 @@
-import { moexFetch } from "./core.ts";
+import { moexFetch } from "./core/fetch.ts";
 
 export type MoextDailyTableRow = {
   date: string;

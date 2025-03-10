@@ -8,6 +8,7 @@ const envKeys = [
   "REDIS_PORT",
   "REDIS_PASSWORD",
   "T_INVEST_READONLY_TOKEN",
+  "T_INVEST_FULL_ACCESS_TOKEN",
   "PASSWORD",
 ];
 

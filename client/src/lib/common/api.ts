@@ -11,6 +11,7 @@ const trpc = createTRPCClient<AppRouter>({
         : "https://bbac3tn498gvd9kvthnn.containers.yandexcloud.net/",
       headers: () => ({
         Authorization: `Basic ${btoa(`${user.name}:${user.password}`)}`,
+        "x-yandex-cloud-authorization": `Basic ${btoa(`${user.name}:${user.password}`)}`,
       }),
       fetch(url, options) {
         return fetch(url, {

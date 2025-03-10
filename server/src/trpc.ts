@@ -2,8 +2,14 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import type { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone";
 import SuperJSON from "superjson";
 
-export const createContext = (opts: CreateHTTPContextOptions) => {
-  const credentials = opts.req.headers.authorization?.split(" ")[1] || "";
+export const createContext = ({
+  req: { headers },
+}: CreateHTTPContextOptions) => {
+  const authorizationHeader =
+    headers.authorization ||
+    (headers["x-yandex-cloud-authorization"] as string);
+
+  const credentials = authorizationHeader.split(" ")[1] || "";
   const [username, password] = Buffer.from(credentials, "base64")
     .toString("utf-8")
     .split(":");

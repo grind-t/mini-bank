@@ -1,6 +1,5 @@
 import tInvestApi from "#features/investments/t-invest-api-integration/core.ts";
 import { repoTransfer } from "#features/investments/t-invest-api-integration/service/repo.ts";
-import { getCurrentMonthTradingDays } from "#features/investments/t-invest-api-integration/service/trading-days.ts";
 import {
   OrderDirection,
   OrderType,
@@ -17,6 +16,8 @@ import { logDCAStrategy } from "./log.ts";
 import { mergeAccountAssets } from "../../assets/helpers/merge-account-assets.ts";
 import { Helpers } from "tinkoff-invest-api";
 import { setDCAStrategy } from "./set.ts";
+import { getMoexTradingDays } from "../../moex-integration/getTradingDays.ts";
+import dayjs from "dayjs";
 
 export async function executeDCAStrategy(
   strategy: DCAStrategy,
@@ -27,19 +28,20 @@ export async function executeDCAStrategy(
     getAssetsFromTInvestApi(strategy.assets.map((v) => v.id)),
   ]).then(([account, assets]) => mergeAccountAssets(assets, account.assets));
 
-  const budgetPromise = getCurrentMonthTradingDays().then(
-    async (tradingDays) => {
-      const budget = strategy.currentMonthBudget / tradingDays;
+  const budgetPromise = getMoexTradingDays(
+    dayjs(),
+    dayjs().endOf("month")
+  ).then(async (tradingDays) => {
+    const budget = strategy.currentMonthBudget / tradingDays;
 
-      await repoTransfer({
-        accountId,
-        direction: OrderDirection.ORDER_DIRECTION_SELL,
-        minSum: budget,
-      });
+    await repoTransfer({
+      accountId,
+      direction: OrderDirection.ORDER_DIRECTION_SELL,
+      minSum: budget,
+    });
 
-      return budget;
-    }
-  );
+    return budget;
+  });
 
   const [assets, budget] = await Promise.all([assetsPromise, budgetPromise]);
   const targetRatios = getDCAStrategyAssetsRatios(strategy.assets);

@@ -1,6 +1,6 @@
 import { it } from "node:test";
 import assert from "node:assert/strict";
-import { mapTInvestApiPortfolio } from "./getFromTInvestApi.ts";
+import { mapTInvestAccount } from "./mapTInvestAccount.ts";
 import type { PortfolioResponse } from "tinkoff-invest-api/cjs/generated/operations.js";
 
 it("should correctly map a PortfolioResponse with valid positions", () => {
@@ -22,7 +22,7 @@ it("should correctly map a PortfolioResponse with valid positions", () => {
     ],
   } as PortfolioResponse;
 
-  const result = mapTInvestApiPortfolio(mockResponse);
+  const result = mapTInvestAccount(mockResponse);
 
   assert.deepStrictEqual(result, {
     id: "test-account",
@@ -56,7 +56,7 @@ it("should handle zero values in all fields", () => {
     ],
   } as PortfolioResponse;
 
-  const result = mapTInvestApiPortfolio(mockResponse);
+  const result = mapTInvestAccount(mockResponse);
 
   assert.deepStrictEqual(result, {
     id: "test-account-zero",

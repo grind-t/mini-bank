@@ -7,7 +7,7 @@ import {
   TimeInForceType,
 } from "tinkoff-invest-api/cjs/generated/orders.js";
 import { rebalanceInvestAccount } from "../../accounts/helpers/rebalance.ts";
-import { getInvestAccountFromTInvestAPI } from "../../accounts/service/get-from-tinvest-api.ts";
+import { getInvestAccountFromTInvestApi } from "../../accounts/service/getFromTInvestApi.ts";
 import { getAssetsFromTInvestApi } from "../../assets/service/get-from-tinvest-api.ts";
 import { getDCAStrategyAssetsRatios } from "../helpers/getAssetsRatio.ts";
 import type { DCAStrategy } from "../model/dca-strategy.ts";
@@ -27,7 +27,7 @@ export async function executeDCAStrategy(
   accountId: string
 ) {
   const assetsPromise = Promise.all([
-    getInvestAccountFromTInvestAPI(accountId),
+    getInvestAccountFromTInvestApi(accountId),
     getAssetsFromTInvestApi(strategy.assets.map((v) => v.id)),
   ]).then(([account, assets]) => mergeAccountAssets(assets, account.assets));
 

@@ -3,10 +3,10 @@ import type { InvestAccount } from "../model.ts";
 import tInvestApi from "#features/investments/t-invest-api-integration/core.ts";
 import type { PortfolioResponse } from "tinkoff-invest-api/cjs/generated/operations.js";
 
-export function mapTInvestAPIPortfolio({
+export function mapTInvestApiPortfolio({
   accountId,
   positions,
-}: PortfolioResponse) {
+}: PortfolioResponse): InvestAccount {
   return {
     id: accountId,
     assets: positions.map((position) => ({
@@ -18,10 +18,10 @@ export function mapTInvestAPIPortfolio({
   };
 }
 
-export async function getInvestAccountFromTInvestAPI(
+export async function getInvestAccountFromTInvestApi(
   accountId: string
 ): Promise<InvestAccount> {
-  return mapTInvestAPIPortfolio(
+  return mapTInvestApiPortfolio(
     await tInvestApi.operations.getPortfolio({ accountId })
   );
 }

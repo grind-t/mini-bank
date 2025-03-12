@@ -13,7 +13,7 @@ import { getDCAStrategyAssetsRatios } from "../helpers/getAssetsRatio.ts";
 import type { DCAStrategy } from "../model/dca-strategy.ts";
 import { PriceType } from "tinkoff-invest-api/cjs/generated/common.js";
 import { logDCAStrategy } from "./log.ts";
-import { mergeAccountAssets } from "../../assets/helpers/merge-account-assets.ts";
+import { mergeAccountAssets } from "../../assets/helpers/mergeAccountAssets.ts";
 import { Helpers } from "tinkoff-invest-api";
 import { setDCAStrategy } from "./set.ts";
 import { getMoexTradingDays } from "../../moex-integration/getTradingDays.ts";

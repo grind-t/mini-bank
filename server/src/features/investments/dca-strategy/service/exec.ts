@@ -69,9 +69,7 @@ export async function executeDCAStrategy(
     }
   }
 
-  const [fulfilledOrders, rejectedOrders] = splitSettled(
-    await Promise.allSettled(orders)
-  );
+  const [fulfilledOrders, rejectedOrders] = await splitSettled(orders);
 
   const spent = fulfilledOrders.reduce(
     (acc, v) => acc + (Helpers.toNumber(v.totalOrderAmount) || 0),

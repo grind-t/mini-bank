@@ -18,6 +18,8 @@ import { Helpers } from "tinkoff-invest-api";
 import { setDCAStrategy } from "./set.ts";
 import { getMoexTradingDays } from "../../moex-integration/getTradingDays.ts";
 import dayjs from "dayjs";
+import { splitSettled } from "#src/features/toolkit/splitSettled.ts";
+import { TRPCError } from "@trpc/server";
 
 export async function executeDCAStrategy(
   strategy: DCAStrategy,
@@ -67,9 +69,11 @@ export async function executeDCAStrategy(
     }
   }
 
-  const results = await Promise.all(orders);
+  const [fulfilledOrders, rejectedOrders] = splitSettled(
+    await Promise.allSettled(orders)
+  );
 
-  const spent = results.reduce(
+  const spent = fulfilledOrders.reduce(
     (acc, v) => acc + (Helpers.toNumber(v.totalOrderAmount) || 0),
     0
   );
@@ -87,6 +91,14 @@ export async function executeDCAStrategy(
     budget,
     spent,
     rebalancedAssets,
-    orderIds: results.map((v) => v.orderId),
+    orderIds: fulfilledOrders.map((v) => v.orderId),
+    orderErrors: rejectedOrders.map((v) => v?.message),
   });
+
+  if (rejectedOrders.length) {
+    throw new TRPCError({
+      message: "Some orders failed, see logs",
+      code: "INTERNAL_SERVER_ERROR",
+    });
+  }
 }

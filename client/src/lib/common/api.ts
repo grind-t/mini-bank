@@ -29,3 +29,10 @@ export const getDCAStrategy = trpc.dcaStrategies.get.query;
 export const setDCAStrategy = trpc.dcaStrategies.set.mutate;
 export const executeDCAStrategy = trpc.dcaStrategies.execute.mutate;
 export const getDCAStrategyLogs = trpc.dcaStrategies.logs.query;
+
+export type Bond = Awaited<ReturnType<typeof getBonds>>[number];
+export type DCAStrategy = Exclude<
+  Awaited<ReturnType<typeof getDCAStrategy>>,
+  null
+>;
+export type DCAStrategyAsset = DCAStrategy["assets"][number];

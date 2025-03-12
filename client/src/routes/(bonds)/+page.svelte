@@ -1,86 +1,88 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { getBonds, getDCAStrategy, setDCAStrategy } from "$lib/common/api";
   import {
-    getCurrentMonthName,
-    getDistanceInYearsText,
-  } from "$lib/common/date";
-  import { getBondRatingText } from "$lib/bonds/rating";
+    getBonds,
+    getDCAStrategy,
+    setDCAStrategy,
+    type Bond,
+    type DCAStrategy,
+    type DCAStrategyAsset,
+  } from "$lib/common/api";
+  import { getCurrentMonthName } from "$lib/common/date";
+  import BondList from "./BondList.svelte";
+  import BondListItem from "./BondListItem.svelte";
 
-  let bonds: Awaited<ReturnType<typeof getBonds>>;
-  let dcaStrategy: Awaited<ReturnType<typeof getDCAStrategy>>;
+  let bonds = $state<Bond[]>([]);
+  let strategy = $state<DCAStrategy>({
+    id: "bonds",
+    currentMonthBudget: 0,
+    assets: [],
+  });
+
+  let assetsMap = $derived(
+    Object.fromEntries(strategy.assets.map((v) => [v.id, v]))
+  );
+
+  let [selectedBonds, restBonds] = $derived(
+    bonds.reduce(
+      (acc, bond) => {
+        const isSelected = !!assetsMap[bond.isin];
+        acc[isSelected ? 0 : 1].push(bond);
+        return acc;
+      },
+      [[] as Bond[], [] as Bond[]]
+    )
+  );
 
   onMount(async () => {
-    [bonds, dcaStrategy] = await Promise.all([
+    [bonds, strategy] = await Promise.all([
       getBonds(),
-      getDCAStrategy({ id: "bonds" }),
+      getDCAStrategy({ id: "bonds" }).then((v) => v ?? strategy),
     ]);
-
-    dcaStrategy ??= {
-      id: "bonds",
-      currentMonthBudget: 0,
-      assets: [],
-    };
   });
+
+  function onAddBondToStrategy(asset: DCAStrategyAsset) {
+    strategy.assets.push(asset);
+    setDCAStrategy(strategy);
+  }
+
+  function onRemoveBondFromStrategy(asset: DCAStrategyAsset) {
+    const idx = strategy.assets.findIndex((v) => v === asset);
+    strategy.assets.splice(idx, 1);
+    setDCAStrategy(strategy);
+  }
 </script>
 
 <main class="flex flex-col flex-1">
-  {#if bonds && dcaStrategy}
+  {#if bonds.length}
     <input
-      value={dcaStrategy.currentMonthBudget || ""}
+      value={strategy.currentMonthBudget || ""}
       class="input m-2"
       type="text"
       placeholder="Сумма на {getCurrentMonthName()}"
       onchange={(e) => {
-        if (!dcaStrategy) return;
-
-        dcaStrategy.currentMonthBudget =
-          Number.parseInt(e.currentTarget.value) || 0;
-        setDCAStrategy(dcaStrategy);
+        strategy.currentMonthBudget =
+          Number.parseFloat(e.currentTarget.value) || 0;
+        setDCAStrategy(strategy);
       }}
     />
-    <ul class="list">
-      {#each bonds as bond}
-        {@const assetIdx = dcaStrategy.assets.findIndex(
-          (a) => a.id == bond.isin
-        )}
-
-        <li class="list-row">
-          <label>
-            <input
-              checked={assetIdx !== -1}
-              type="checkbox"
-              class="checkbox checkbox-xs"
-              onchange={(e) => {
-                if (!dcaStrategy) return;
-
-                const { checked } = e.currentTarget;
-
-                if (checked) {
-                  dcaStrategy?.assets.push({ id: bond.isin, weight: 1 });
-                } else {
-                  dcaStrategy?.assets.splice(assetIdx, 1);
-                }
-
-                setDCAStrategy(dcaStrategy);
-              }}
-            />
-          </label>
-          <div class="list-col-grow flex">
-            <button
-              class="flex-3 flex items-center gap-1"
-              onclick={() => navigator.clipboard.writeText(bond.isin)}
-            >
-              {bond.name}
-            </button>
-            <div class="flex-2">{getBondRatingText(bond.rating)}</div>
-            <div class="flex-2">{bond.yield}%</div>
-            <div class="flex-2">
-              {getDistanceInYearsText(new Date(bond.maturityDate))}
-            </div>
-          </div>
-        </li>
+    <BondList>
+      {#each selectedBonds as bond}
+        <BondListItem
+          {bond}
+          strategyAsset={assetsMap[bond.isin]}
+          onAddToStrategy={onAddBondToStrategy}
+          onRemoveFromStrategy={onRemoveBondFromStrategy}
+        />
       {/each}
-    </ul>
+      {#each restBonds as bond}
+        <BondListItem
+          {bond}
+          strategyAsset={assetsMap[bond.isin]}
+          onAddToStrategy={onAddBondToStrategy}
+          onRemoveFromStrategy={onRemoveBondFromStrategy}
+        />
+      {/each}
+    </BondList>
   {/if}
 </main>

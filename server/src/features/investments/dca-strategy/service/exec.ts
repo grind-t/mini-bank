@@ -20,6 +20,7 @@ import { getMoexTradingDays } from "../../moex-integration/getTradingDays.ts";
 import dayjs from "dayjs";
 import { splitSettled } from "#src/features/toolkit/splitSettled.ts";
 import { TRPCError } from "@trpc/server";
+import { sum } from "#src/features/toolkit/sum.ts";
 
 export async function executeDCAStrategy(
   strategy: DCAStrategy,
@@ -70,10 +71,9 @@ export async function executeDCAStrategy(
   }
 
   const [fulfilledOrders, rejectedOrders] = await splitSettled(orders);
-
-  const spent = fulfilledOrders.reduce(
-    (acc, v) => acc + (Helpers.toNumber(v.totalOrderAmount) || 0),
-    0
+  const spent = sum(
+    fulfilledOrders,
+    (v) => Helpers.toNumber(v.totalOrderAmount) || 0
   );
 
   repoTransfer({ accountId, direction: OrderDirection.ORDER_DIRECTION_BUY });

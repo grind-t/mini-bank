@@ -1,3 +1,4 @@
+import { sum } from "#src/features/toolkit/sum.ts";
 import type { InvestAccountAsset } from "../model.ts";
 
 export function rebalanceInvestAccount(
@@ -10,8 +11,7 @@ export function rebalanceInvestAccount(
   if (!budget || !assets.length) return rebalancedAssets;
 
   const balances = assets.map((v) => v.quantity * v.averagePrice);
-  const totalBalance = balances.reduce((acc, v) => acc + v, 0);
-  const targetBalance = totalBalance + budget;
+  const targetBalance = sum(balances) + budget;
   const targetBalances = targetRatios.map((v) => targetBalance * v);
   const diffs = targetBalances.map((v, i) => v - balances[i]);
 

@@ -3,7 +3,10 @@
   import {
     getBonds,
     getDCAStrategy,
+    getHiddenBonds,
+    hideBond,
     setDCAStrategy,
+    showBond,
     type Bond,
     type DCAStrategy,
     type DCAStrategyAsset,
@@ -11,8 +14,10 @@
   import { getCurrentMonthName } from "$lib/common/date";
   import BondList from "./BondList.svelte";
   import BondListItem from "./BondListItem.svelte";
+  import { SvelteSet } from "svelte/reactivity";
 
   let bonds = $state<Bond[]>([]);
+  let hidden = $state(new SvelteSet<string>());
   let strategy = $state<DCAStrategy>({
     id: "bonds",
     currentMonthBudget: 0,
@@ -23,20 +28,22 @@
     Object.fromEntries(strategy.assets.map((v) => [v.id, v]))
   );
 
-  let [selectedBonds, restBonds] = $derived(
+  let [selectedBonds, visibleBonds, hiddenBonds] = $derived(
     bonds.reduce(
-      (acc, bond) => {
+      (acc: Bond[][], bond) => {
         const isSelected = !!assetsMap[bond.isin];
-        acc[isSelected ? 0 : 1].push(bond);
+        const isHidden = hidden.has(bond.isin);
+        acc[isSelected ? 0 : isHidden ? 2 : 1].push(bond);
         return acc;
       },
-      [[] as Bond[], [] as Bond[]]
+      [[], [], []]
     )
   );
 
   onMount(async () => {
-    [bonds, strategy] = await Promise.all([
+    [bonds, hidden, strategy] = await Promise.all([
       getBonds(),
+      getHiddenBonds().then((v) => new SvelteSet(v)),
       getDCAStrategy({ id: "bonds" }).then((v) => v ?? strategy),
     ]);
   });
@@ -67,7 +74,7 @@
       }}
     />
     <BondList>
-      {#each selectedBonds as bond}
+      {#each selectedBonds as bond (bond.isin)}
         <BondListItem
           {bond}
           strategyAsset={assetsMap[bond.isin]}
@@ -75,12 +82,25 @@
           onRemoveFromStrategy={onRemoveBondFromStrategy}
         />
       {/each}
-      {#each restBonds as bond}
+      {#each visibleBonds as bond (bond.isin)}
         <BondListItem
           {bond}
-          strategyAsset={assetsMap[bond.isin]}
           onAddToStrategy={onAddBondToStrategy}
           onRemoveFromStrategy={onRemoveBondFromStrategy}
+          onHide={() => {
+            hidden.add(bond.isin);
+            hideBond({ id: bond.isin });
+          }}
+        />
+      {/each}
+      {#each hiddenBonds as bond (bond.isin)}
+        <BondListItem
+          {bond}
+          isHidden
+          onShow={() => {
+            hidden.delete(bond.isin);
+            showBond({ id: bond.isin });
+          }}
         />
       {/each}
     </BondList>

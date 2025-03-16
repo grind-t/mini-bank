@@ -1,5 +1,6 @@
 import { toRecord } from "#src/features/toolkit/toRecord.ts";
-import { getMoexBondMarketYield } from "../moex-integration/getBondMarketYield.ts";
+import { redis } from "#src/redis.ts";
+import { getMoexBondMarketYield } from "../../moex-integration/getBondMarketYield.ts";
 
 export type Bond = {
   isin: string;
@@ -9,7 +10,15 @@ export type Bond = {
   rating: number;
 };
 
+const cacheKey = "bonds_cache";
+
 export async function listBonds(): Promise<Bond[]> {
+  const cachedResponse = await redis.get(cacheKey);
+
+  if (cachedResponse) {
+    return JSON.parse(cachedResponse);
+  }
+
   const bondFinderResponse = await fetch(
     "https://raw.githubusercontent.com/bond-finder-lab/backend/refs/heads/master/docs/report-v1.json"
   );
@@ -51,7 +60,11 @@ export async function listBonds(): Promise<Bond[]> {
     return v;
   });
 
-  return (await Promise.all(correctedBonds)).sort(
+  const response = (await Promise.all(correctedBonds)).sort(
     (a, b) => (b.yield || 0) - (a.yield || 0)
   );
+
+  redis.set(cacheKey, JSON.stringify(response), "EX", 21600);
+
+  return response;
 }

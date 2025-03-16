@@ -25,7 +25,7 @@
   });
 
   let minYield = $state(23);
-  let minRating = $state(3);
+  let minRating = $state(4);
   let maxDistance = $state(2);
 
   let assetsMap = $derived(

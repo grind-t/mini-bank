@@ -11,7 +11,7 @@
     type DCAStrategy,
     type DCAStrategyAsset,
   } from "$lib/common/api";
-  import { getCurrentMonthName } from "$lib/common/date";
+  import { getCurrentMonthName, getDistanceInYears } from "$lib/common/date";
   import BondList from "./BondList.svelte";
   import BondListItem from "./BondListItem.svelte";
   import { SvelteSet } from "svelte/reactivity";
@@ -24,6 +24,10 @@
     assets: [],
   });
 
+  let minYield = $state(23);
+  let minRating = $state(3);
+  let maxDistance = $state(2);
+
   let assetsMap = $derived(
     Object.fromEntries(strategy.assets.map((v) => [v.id, v]))
   );
@@ -32,8 +36,26 @@
     bonds.reduce(
       (acc: Bond[][], bond) => {
         const isSelected = !!assetsMap[bond.isin];
+        if (isSelected) {
+          acc[0].push(bond);
+          return acc;
+        }
+
         const isHidden = hidden.has(bond.isin);
-        acc[isSelected ? 0 : isHidden ? 2 : 1].push(bond);
+        if (isHidden) {
+          acc[2].push(bond);
+          return acc;
+        }
+
+        const isInFilter =
+          bond.yield >= minYield &&
+          bond.rating >= minRating &&
+          getDistanceInYears(new Date(bond.maturityDate)) <= maxDistance;
+
+        if (isInFilter) {
+          acc[1].push(bond);
+        }
+
         return acc;
       },
       [[], [], []]
@@ -68,9 +90,39 @@
       type="text"
       placeholder="Сумма на {getCurrentMonthName()}"
       onchange={(e) => {
-        strategy.currentMonthBudget =
-          Number.parseFloat(e.currentTarget.value) || 0;
+        e.preventDefault();
+        strategy.currentMonthBudget = Number(e.currentTarget.value) || 0;
         setDCAStrategy(strategy);
+      }}
+    />
+    <input
+      value={minYield}
+      class="input m-2"
+      type="text"
+      placeholder="Минимальная доходность"
+      onchange={(e) => {
+        e.preventDefault();
+        minYield = Number(e.currentTarget.value) || 0;
+      }}
+    />
+    <input
+      value={minRating}
+      class="input m-2"
+      type="text"
+      placeholder="Минимальный рейтинг"
+      onchange={(e) => {
+        e.preventDefault();
+        minRating = Number(e.currentTarget.value) || 0;
+      }}
+    />
+    <input
+      value={maxDistance}
+      class="input m-2"
+      type="text"
+      placeholder="Максимальный срок"
+      onchange={(e) => {
+        e.preventDefault();
+        maxDistance = Number(e.currentTarget.value);
       }}
     />
     <BondList>

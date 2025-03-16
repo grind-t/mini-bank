@@ -2,10 +2,10 @@ import assert from "node:assert";
 import { it } from "node:test";
 import { toRecord } from "./toRecord.ts";
 
-it("should convert array of strings to a record mapping each string to itself", () => {
+it("should convert array of strings to a record mapping each string to index", () => {
   const input = ["a", "b", "c"];
   const result = toRecord(input);
-  assert.deepStrictEqual(result, { a: "a", b: "b", c: "c" });
+  assert.deepStrictEqual(result, { a: 0, b: 1, c: 2 });
 });
 
 it("should convert array of objects to a record using custom keySelector", () => {

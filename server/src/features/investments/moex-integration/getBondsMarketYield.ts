@@ -1,6 +1,6 @@
 import { moexFetch } from "./core/fetch.ts";
 
-export type MoexBondMarketYield = Partial<{
+export type MoexBondMarketYield = {
   SECID: string;
   BOARDID: string;
   PRICE: number;
@@ -23,10 +23,10 @@ export type MoexBondMarketYield = Partial<{
   TRADEMOMENT: string;
   SEQNUM: number;
   SYSTIME: string;
-}>;
+};
 
-export const getMoexBondMarketYield = (id: string) =>
+export const getMoexBondsMarketYield = () =>
   moexFetch<MoexBondMarketYield>(
-    `/engines/stock/markets/bonds/securities/${id}.json`,
+    `/engines/stock/markets/bonds/securities.json`,
     "marketdata_yields"
-  ).then((v) => v.at(0));
+  );

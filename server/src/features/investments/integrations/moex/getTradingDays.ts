@@ -1,5 +1,5 @@
 import { getMoexDailyTable } from "./getDailyTable.ts";
-import { getTradingDays } from "../exchange/getTradingDays.ts";
+import { getTradingDays } from "../../exchange/getTradingDays.ts";
 import dayjs from "dayjs";
 
 export async function getMoexTradingDays(

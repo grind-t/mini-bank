@@ -2,9 +2,9 @@ import {
   type InstrumentShort,
   InstrumentIdType,
 } from "tinkoff-invest-api/cjs/generated/instruments.js";
-import tInvestApi from "../../t-invest-api-integration/core.ts";
+import tInvestApi from "../../integrations/t-invest-api/core.ts";
 import { InstrumentType } from "tinkoff-invest-api/cjs/generated/common.js";
-import { getBondPrice } from "../../t-invest-api-integration/helpers/bond-price.ts";
+import { getBondPrice } from "../../integrations/t-invest-api/helpers/bond-price.ts";
 
 export async function getAssetPriceFromTInvestApi(instrument: InstrumentShort) {
   const pricePromise = tInvestApi.marketData

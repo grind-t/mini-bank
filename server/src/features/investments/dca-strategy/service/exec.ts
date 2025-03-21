@@ -1,5 +1,5 @@
-import tInvestApi from "#features/investments/t-invest-api-integration/core.ts";
-import { repoTransfer } from "#features/investments/t-invest-api-integration/service/repo.ts";
+import tInvestApi from "#features/investments/integrations/t-invest-api/core.ts";
+import { repoTransfer } from "#features/investments/integrations/t-invest-api/service/repo.ts";
 import {
   OrderDirection,
   OrderType,
@@ -16,7 +16,7 @@ import { logDCAStrategy } from "./log.ts";
 import { mergeAccountAssets } from "../../assets/helpers/mergeAccountAssets.ts";
 import { Helpers } from "tinkoff-invest-api";
 import { setDCAStrategy } from "./set.ts";
-import { getMoexTradingDays } from "../../moex-integration/getTradingDays.ts";
+import { getMoexTradingDays } from "../../integrations/moex/getTradingDays.ts";
 import dayjs from "dayjs";
 import { splitSettled } from "#src/features/toolkit/splitSettled.ts";
 import { TRPCError } from "@trpc/server";

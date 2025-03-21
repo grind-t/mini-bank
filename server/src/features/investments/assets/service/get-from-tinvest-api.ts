@@ -1,5 +1,5 @@
 import type { Asset } from "../model.ts";
-import tInvestApi from "#features/investments/t-invest-api-integration/core.ts";
+import tInvestApi from "#features/investments/integrations/t-invest-api/core.ts";
 import { getAssetPriceFromTInvestApi } from "./get-price-from-tinvest-api.ts";
 
 export async function getAssetFromTInvestApi(id: string): Promise<Asset> {

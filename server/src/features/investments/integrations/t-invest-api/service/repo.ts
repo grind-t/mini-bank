@@ -1,5 +1,5 @@
 import { Helpers } from "tinkoff-invest-api";
-import tInvestApi from "#features/investments/t-invest-api-integration/core.ts";
+import tInvestApi from "#features/investments/integrations/t-invest-api/core.ts";
 import {
   OrderDirection,
   OrderIdType,

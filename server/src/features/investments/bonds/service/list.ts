@@ -1,6 +1,6 @@
 import { toRecord } from "#src/features/toolkit/toRecord.ts";
 import { redis } from "#src/redis.ts";
-import { getMoexBondsMarketYield } from "../../moex-integration/getBondsMarketYield.ts";
+import { getMoexBondsMarketYield } from "../../integrations/moex/getBondsMarketYield.ts";
 
 export type Bond = {
   isin: string;

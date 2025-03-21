@@ -2,7 +2,7 @@ import { $, usePwsh } from "zx";
 
 usePwsh();
 
-const dockerTag = "cr.yandex/crp7scpfvjhcm2qi6hfh/mini-bank:latest";
+const dockerTag = "cr.yandex/crpucu00vnjnitf4u599/mini-bank:latest";
 const envKeys = [
   "REDIS_HOST",
   "REDIS_PORT",

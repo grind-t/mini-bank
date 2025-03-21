@@ -10,3 +10,23 @@ export const redis = new Redis({
     ),
   },
 });
+
+export const cacheMinutes = (v: number) => v * 60;
+export const cacheHours = (v: number) => cacheMinutes(v) * 60;
+
+export async function withCache<T>(
+  key: string,
+  seconds: number,
+  fn: () => Promise<T>
+) {
+  const cachedResponse = await redis.get(key);
+
+  if (cachedResponse) {
+    return JSON.parse(cachedResponse);
+  }
+
+  const response = await fn();
+
+  redis.set(key, JSON.stringify(response), "EX", seconds);
+  return response;
+}

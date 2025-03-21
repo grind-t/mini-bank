@@ -1,5 +1,6 @@
 import { toRecord } from "#src/features/toolkit/toRecord.ts";
-import { redis } from "#src/redis.ts";
+import { cacheHours, withCache } from "#src/redis.ts";
+import { getBondFinderReport } from "../../integrations/bond-finder/report.ts";
 import { getMoexBondsMarketYield } from "../../integrations/moex/getBondsMarketYield.ts";
 
 export type Bond = {
@@ -10,56 +11,36 @@ export type Bond = {
   rating: number;
 };
 
-const cacheKey = "bonds_cache";
-
 export async function listBonds(): Promise<Bond[]> {
-  const cachedResponse = await redis.get(cacheKey);
+  return withCache("bonds_cache", cacheHours(6), async () => {
+    const [bondFinder, marketYields] = await Promise.all([
+      getBondFinderReport(),
+      getMoexBondsMarketYield().then((v) => toRecord(v, (v) => v.SECID)),
+    ]);
 
-  if (cachedResponse) {
-    return JSON.parse(cachedResponse);
-  }
+    return bondFinder
+      .reduce((acc: Bond[], item) => {
+        const isRub = item.rub;
+        const highRisk = item.high_risk;
+        const hasOffer = item.has_offer;
+        const isQual = item.qual;
 
-  const [bondFinder, marketYields] = await Promise.all([
-    fetch(
-      "https://raw.githubusercontent.com/bond-finder-lab/backend/refs/heads/master/docs/report-v1.json"
-    ).then(
-      (v) =>
-        v.json() as Promise<{
-          date: string;
-          cols: string[];
-          rows: any[][];
-        }>
-    ),
-    getMoexBondsMarketYield().then((v) => toRecord(v, (v) => v.SECID)),
-  ]);
+        if (isRub && !highRisk && !hasOffer && !isQual) {
+          const isin = item.isin;
+          const effectiveYield = marketYields[isin]?.EFFECTIVEYIELD || 0;
+          const roundedEffectiveYield = Math.round(effectiveYield * 100) / 100;
 
-  const indicies = toRecord(bondFinder.cols);
+          acc.push({
+            isin,
+            name: item.name,
+            maturityDate: new Date(item.maturity_date),
+            yield: roundedEffectiveYield || item.close_yield,
+            rating: item.rating,
+          });
+        }
 
-  const bonds = bondFinder.rows
-    .reduce((acc: Bond[], row) => {
-      const isRub = row[indicies["rub"]];
-      const highRisk = row[indicies["high_risk"]];
-      const hasOffer = row[indicies["has_offer"]];
-      const isQual = row[indicies["qual"]];
-
-      if (isRub && !highRisk && !hasOffer && !isQual) {
-        const isin = row[indicies["isin"]];
-        const effectiveYield = marketYields[isin]?.EFFECTIVEYIELD || 0;
-        const roundedEffectiveYield = Math.round(effectiveYield * 100) / 100;
-
-        acc.push({
-          isin: row[indicies["isin"]],
-          name: row[indicies["name"]],
-          maturityDate: new Date(row[indicies["maturity_date"]]),
-          yield: roundedEffectiveYield || row[indicies["close_yield"]],
-          rating: row[indicies["rating"]],
-        });
-      }
-
-      return acc;
-    }, [])
-    .sort((a, b) => (b.yield || 0) - (a.yield || 0));
-
-  redis.set(cacheKey, JSON.stringify(bonds), "EX", 21600);
-  return bonds;
+        return acc;
+      }, [])
+      .sort((a, b) => (b.yield || 0) - (a.yield || 0));
+  });
 }

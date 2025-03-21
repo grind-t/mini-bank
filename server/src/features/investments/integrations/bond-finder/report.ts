@@ -1,5 +1,4 @@
 import { toRecord } from "#src/features/toolkit/toRecord.ts";
-import { cacheHours, withCache } from "#src/redis.ts";
 
 export type BondFinderReportItem = {
   isin: string;
@@ -25,17 +24,15 @@ export type BondFinderReportItem = {
 };
 
 export async function getBondFinderReport(): Promise<BondFinderReportItem[]> {
-  return withCache("bond_finder_report_cache", cacheHours(6), async () => {
-    const response = await fetch(
-      "https://raw.githubusercontent.com/bond-finder-lab/backend/refs/heads/master/docs/report-v1.json"
-    );
+  const response = await fetch(
+    "https://raw.githubusercontent.com/bond-finder-lab/backend/refs/heads/master/docs/report-v1.json"
+  );
 
-    const data = (await response.json()) as {
-      date: string;
-      cols: (keyof BondFinderReportItem)[];
-      rows: any[][];
-    };
+  const data = (await response.json()) as {
+    date: string;
+    cols: (keyof BondFinderReportItem)[];
+    rows: any[][];
+  };
 
-    return data.rows.map((row) => toRecord(row, (_, i) => data.cols[i]));
-  });
+  return data.rows.map((row) => toRecord(row, (_, i) => data.cols[i]));
 }

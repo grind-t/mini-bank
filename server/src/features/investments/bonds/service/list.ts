@@ -2,6 +2,7 @@ import { toRecord } from "#src/features/toolkit/toRecord.ts";
 import { cacheHours, withCache } from "#src/redis.ts";
 import { getBondFinderReport } from "../../integrations/bond-finder/report.ts";
 import { getMoexBondsMarketYield } from "../../integrations/moex/getBondsMarketYield.ts";
+import tInvestApi from "../../integrations/t-invest-api/core.ts";
 
 export type Bond = {
   isin: string;
@@ -13,21 +14,25 @@ export type Bond = {
 
 export async function listBonds(): Promise<Bond[]> {
   return withCache("bonds_cache", cacheHours(6), async () => {
-    const [bondFinder, marketYields] = await Promise.all([
+    const [report, bonds, yields] = await Promise.all([
       getBondFinderReport(),
+      tInvestApi.instruments
+        .bonds({})
+        .then((v) => toRecord(v.instruments, (v) => v.isin)),
       getMoexBondsMarketYield().then((v) => toRecord(v, (v) => v.SECID)),
     ]);
 
-    return bondFinder
+    return report
       .reduce((acc: Bond[], item) => {
+        const bond = bonds[item.isin];
         const isRub = item.rub;
         const highRisk = item.high_risk;
         const hasOffer = item.has_offer;
-        const isQual = item.qual;
+        const isQual = item.qual || bond?.forQualInvestorFlag;
 
         if (isRub && !highRisk && !hasOffer && !isQual) {
           const isin = item.isin;
-          const effectiveYield = marketYields[isin]?.EFFECTIVEYIELD || 0;
+          const effectiveYield = yields[isin]?.EFFECTIVEYIELD || 0;
           const roundedEffectiveYield = Math.round(effectiveYield * 100) / 100;
 
           acc.push({

@@ -41,7 +41,6 @@
   <div class="list-col-grow flex">
     <div class="flex-3 flex flex-col gap-2">
       <div>{bond.name}</div>
-      <div>{bond.sector}</div>
       <button
         class="h-fit"
         aria-label="Скопировать isin"

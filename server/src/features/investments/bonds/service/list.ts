@@ -1,51 +1,29 @@
-import { toRecord } from "#src/features/toolkit/toRecord.ts";
-import { cacheHours, withCache } from "#src/redis.ts";
-import { getBondFinderReport } from "../../integrations/bond-finder/report.ts";
-import { getMoexBondsMarketYield } from "../../integrations/moex/getBondsMarketYield.ts";
-import tInvestApi from "../../integrations/t-invest-api/core.ts";
+import { booleanFilter } from "#src/features/toolkit/filters/boolean.ts";
+import { dateFilter } from "#src/features/toolkit/filters/date.ts";
+import { numberFilter } from "#src/features/toolkit/filters/number.ts";
+import { stringFilter } from "#src/features/toolkit/filters/string.ts";
+import type { z } from "zod";
+import { listAllBonds } from "./listAll.ts";
+import type { BondListFilterSchema } from "./list.schema.ts";
 
-export type Bond = {
-  isin: string;
-  name: string;
-  maturityDate: Date;
-  yield: number;
-  rating: number;
-};
+export type BondListFilter = z.infer<typeof BondListFilterSchema>;
 
-export async function listBonds(): Promise<Bond[]> {
-  return withCache("bonds_cache", cacheHours(6), async () => {
-    const [report, bonds, yields] = await Promise.all([
-      getBondFinderReport(),
-      tInvestApi.instruments
-        .bonds({})
-        .then((v) => toRecord(v.instruments, (v) => v.isin)),
-      getMoexBondsMarketYield().then((v) => toRecord(v, (v) => v.SECID)),
-    ]);
+export async function listBonds(filter?: BondListFilter) {
+  const allBonds = await listAllBonds();
 
-    return report
-      .reduce((acc: Bond[], item) => {
-        const bond = bonds[item.isin];
-        const isRub = item.rub;
-        const highRisk = item.high_risk;
-        const hasOffer = item.has_offer;
-        const isQual = item.qual || bond?.forQualInvestorFlag;
+  if (!filter) return allBonds;
 
-        if (isRub && !highRisk && !hasOffer && !isQual) {
-          const isin = item.isin;
-          const effectiveYield = yields[isin]?.EFFECTIVEYIELD || 0;
-          const roundedEffectiveYield = Math.round(effectiveYield * 100) / 100;
-
-          acc.push({
-            isin,
-            name: item.name,
-            maturityDate: new Date(item.maturity_date),
-            yield: roundedEffectiveYield || item.close_yield,
-            rating: item.rating,
-          });
-        }
-
-        return acc;
-      }, [])
-      .sort((a, b) => (b.yield || 0) - (a.yield || 0));
-  });
+  return allBonds.filter(
+    (bond) =>
+      filter.whitelist?.includes(bond.isin) ||
+      (!filter.blacklist?.includes(bond.isin) &&
+        numberFilter(bond.yield, filter.yield) &&
+        numberFilter(bond.rating.tInvest, filter.rating?.tInvest) &&
+        numberFilter(bond.rating.bondFinder, filter.rating?.bondFinder) &&
+        dateFilter(bond.maturityDate, filter.maturityDate) &&
+        stringFilter(bond.currency, filter.currency) &&
+        stringFilter(bond.sector, filter.sector) &&
+        booleanFilter(bond.hasOffer, filter.hasOffer) &&
+        booleanFilter(bond.forQual, filter.forQual))
+  );
 }

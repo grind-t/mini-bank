@@ -4,11 +4,18 @@ import { hideBond } from "./service/hide.ts";
 import { listBonds } from "./service/list.ts";
 import { getHiddenBonds } from "./service/getHidden.ts";
 import { showBond } from "./service/show.ts";
+import { BondListFilterSchema } from "./service/list.schema.ts";
 
 export const bonds = {
-  list: publicProcedure.query(async () => {
-    return await listBonds();
-  }),
+  list: publicProcedure
+    .input(
+      z.object({
+        filter: BondListFilterSchema.optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      return await listBonds(input.filter);
+    }),
   hide: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input }) => {

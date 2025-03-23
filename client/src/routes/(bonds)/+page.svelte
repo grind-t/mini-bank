@@ -3,71 +3,69 @@
   import {
     getBonds,
     getDCAStrategy,
-    getHiddenBonds,
-    hideBond,
     setDCAStrategy,
-    showBond,
     type Bond,
+    type BondListFilter,
     type DCAStrategy,
     type DCAStrategyAsset,
   } from "$lib/common/api";
-  import { getCurrentMonthName, getDistanceInYears } from "$lib/common/date";
   import BondList from "./BondList.svelte";
   import BondListItem from "./BondListItem.svelte";
-  import { SvelteSet } from "svelte/reactivity";
+  import CurrentMonthBudget from "./CurrentMonthBudget.svelte";
+  import dayjs from "dayjs";
+
+  let filter = $state({
+    whitelist: [] as string[],
+    yield: {
+      min: 22 as number | undefined,
+      max: 32 as number | undefined,
+    },
+    rating: {
+      tInvest: {
+        min: 2 as number | undefined,
+      },
+      bondFinder: {
+        min: 4 as number | undefined,
+      },
+    },
+    maturityDate: {
+      max: dayjs().add(2, "years").toDate() as Date | undefined,
+    },
+    currency: {
+      include: ["rub"],
+    },
+    sector: {
+      exclude: ["real_estate"],
+    },
+    hasOffer: false,
+    forQual: false,
+  } satisfies BondListFilter);
 
   let bonds = $state<Bond[]>([]);
-  let hidden = $state(new SvelteSet<string>());
   let strategy = $state<DCAStrategy>({
     id: "bonds",
     currentMonthBudget: 0,
     assets: [],
   });
 
-  let minYield = $state(23);
-  let minRating = $state(4);
-  let maxDistance = $state(2);
-
   let assetsMap = $derived(
     Object.fromEntries(strategy.assets.map((v) => [v.id, v]))
   );
 
-  let [selectedBonds, visibleBonds, hiddenBonds] = $derived(
+  let [selectedBonds, restBonds] = $derived(
     bonds.reduce(
       (acc: Bond[][], bond) => {
-        const isSelected = !!assetsMap[bond.isin];
-        if (isSelected) {
-          acc[0].push(bond);
-          return acc;
-        }
-
-        const isHidden = hidden.has(bond.isin);
-        if (isHidden) {
-          acc[2].push(bond);
-          return acc;
-        }
-
-        const isInFilter =
-          bond.yield >= minYield &&
-          bond.rating >= minRating &&
-          getDistanceInYears(new Date(bond.maturityDate)) <= maxDistance;
-
-        if (isInFilter) {
-          acc[1].push(bond);
-        }
-
+        acc[assetsMap[bond.isin] ? 0 : 1].push(bond);
         return acc;
       },
-      [[], [], []]
+      [[], []]
     )
   );
 
   onMount(async () => {
-    [bonds, hidden, strategy] = await Promise.all([
-      getBonds(),
-      getHiddenBonds().then((v) => new SvelteSet(v)),
-      getDCAStrategy({ id: "bonds" }).then((v) => v ?? strategy),
-    ]);
+    strategy = (await getDCAStrategy({ id: "bonds" })) ?? strategy;
+    filter.whitelist = strategy.assets.map((v) => v.id);
+    bonds = await getBonds({ filter });
   });
 
   function onAddBondToStrategy(asset: DCAStrategyAsset) {
@@ -84,45 +82,11 @@
 
 <main class="flex flex-col flex-1">
   {#if bonds.length}
-    <input
-      value={strategy.currentMonthBudget || ""}
-      class="input m-2"
-      type="text"
-      placeholder="Сумма на {getCurrentMonthName()}"
-      onchange={(e) => {
-        e.preventDefault();
-        strategy.currentMonthBudget = Number(e.currentTarget.value) || 0;
+    <CurrentMonthBudget
+      value={strategy.currentMonthBudget}
+      onChange={(value) => {
+        strategy.currentMonthBudget = value;
         setDCAStrategy(strategy);
-      }}
-    />
-    <input
-      value={minYield}
-      class="input m-2"
-      type="text"
-      placeholder="Минимальная доходность"
-      onchange={(e) => {
-        e.preventDefault();
-        minYield = Number(e.currentTarget.value) || 0;
-      }}
-    />
-    <input
-      value={minRating}
-      class="input m-2"
-      type="text"
-      placeholder="Минимальный рейтинг"
-      onchange={(e) => {
-        e.preventDefault();
-        minRating = Number(e.currentTarget.value) || 0;
-      }}
-    />
-    <input
-      value={maxDistance}
-      class="input m-2"
-      type="text"
-      placeholder="Максимальный срок"
-      onchange={(e) => {
-        e.preventDefault();
-        maxDistance = Number(e.currentTarget.value);
       }}
     />
     <BondList>
@@ -134,25 +98,11 @@
           onRemoveFromStrategy={onRemoveBondFromStrategy}
         />
       {/each}
-      {#each visibleBonds as bond (bond.isin)}
+      {#each restBonds as bond (bond.isin)}
         <BondListItem
           {bond}
           onAddToStrategy={onAddBondToStrategy}
           onRemoveFromStrategy={onRemoveBondFromStrategy}
-          onHide={() => {
-            hidden.add(bond.isin);
-            hideBond({ id: bond.isin });
-          }}
-        />
-      {/each}
-      {#each hiddenBonds as bond (bond.isin)}
-        <BondListItem
-          {bond}
-          isHidden
-          onShow={() => {
-            hidden.delete(bond.isin);
-            showBond({ id: bond.isin });
-          }}
         />
       {/each}
     </BondList>

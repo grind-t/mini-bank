@@ -34,6 +34,7 @@ export const executeDCAStrategy = trpc.dcaStrategies.execute.mutate;
 export const getDCAStrategyLogs = trpc.dcaStrategies.logs.query;
 
 export type Bond = Awaited<ReturnType<typeof getBonds>>[number];
+export type BondListFilter = Parameters<typeof getBonds>[0]["filter"];
 export type DCAStrategy = Exclude<
   Awaited<ReturnType<typeof getDCAStrategy>>,
   null

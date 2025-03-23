@@ -1,4 +1,17 @@
-export function getBondRatingText(rating: number) {
+export function getTInvestBondRatingText(rating: number): string {
+  switch (rating) {
+    case 0:
+      return "T-C";
+    case 1:
+      return "T-B";
+    case 2:
+      return "T-A";
+    default:
+      return "wtf";
+  }
+}
+
+export function getBondFinderRatingText(rating: number) {
   switch (rating) {
     case 6:
       return "AAA";

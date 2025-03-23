@@ -11,12 +11,19 @@ export const redis = new Redis({
   },
 });
 
-export const cacheMinutes = (v: number) => v * 60;
-export const cacheHours = (v: number) => cacheMinutes(v) * 60;
-
 export async function withCache<T>(
   key: string,
-  seconds: number,
+  {
+    days = 0,
+    hours = 0,
+    minutes = 0,
+    seconds = 0,
+  }: {
+    days?: number;
+    hours?: number;
+    minutes?: number;
+    seconds?: number;
+  },
   fn: () => Promise<T>
 ) {
   const cachedResponse = await redis.get(key);
@@ -27,6 +34,11 @@ export async function withCache<T>(
 
   const response = await fn();
 
-  redis.set(key, JSON.stringify(response), "EX", seconds);
+  redis.set(
+    key,
+    JSON.stringify(response),
+    "EX",
+    days * 24 * 60 * 60 + hours * 60 * 60 + minutes * 60 + seconds
+  );
   return response;
 }

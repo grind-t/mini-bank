@@ -1,0 +1,1 @@
+import{b as t,l as o,d as u,u as a,e as c}from"./DdDzDoP8.js";function f(n){t===null&&o(),u&&t.l!==null?l(t).m.push(n):a(()=>{const e=c(n);if(typeof e=="function")return e})}function l(n){var e=n.l;return e.u??(e.u={a:[],b:[],m:[]})}export{f as o};

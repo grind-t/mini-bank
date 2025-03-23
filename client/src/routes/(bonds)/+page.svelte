@@ -22,7 +22,7 @@
     },
     rating: {
       tInvest: {
-        min: 2 as number | undefined,
+        min: 1 as number | undefined,
       },
       bondFinder: {
         min: 4 as number | undefined,
@@ -55,7 +55,14 @@
   let [selectedBonds, restBonds] = $derived(
     bonds.reduce(
       (acc: Bond[][], bond) => {
-        acc[assetsMap[bond.isin] ? 0 : 1].push(bond);
+        const { isin, rating } = bond;
+
+        if (assetsMap[isin]) {
+          acc[0].push(bond);
+        } else if (rating.tInvest !== 1 || rating.bondFinder) {
+          acc[1].push(bond);
+        }
+
         return acc;
       },
       [[], []]

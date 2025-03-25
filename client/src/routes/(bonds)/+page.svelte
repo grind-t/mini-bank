@@ -17,28 +17,29 @@
   let filter = $state({
     whitelist: [] as string[],
     yield: {
-      min: 22 as number | undefined,
-      max: 32 as number | undefined,
+      gte: 22 as number | undefined,
+      lte: 32 as number | undefined,
     },
     rating: {
       tInvest: {
-        min: 1 as number | undefined,
+        gte: 1 as number | undefined,
       },
       bondFinder: {
-        min: 4 as number | undefined,
+        gte: 4 as number | undefined,
       },
     },
     maturityDate: {
-      max: dayjs().add(2, "years").toDate() as Date | undefined,
+      lte: dayjs().add(2, "years").toDate() as Date | undefined,
+      unit: "day",
     },
     currency: {
-      include: ["rub"],
+      in: ["rub"],
     },
     sector: {
-      exclude: ["real_estate"],
+      nin: ["real_estate"],
     },
-    hasOffer: false,
-    forQual: false,
+    hasOffer: { eq: false },
+    forQual: { eq: false },
   } satisfies BondListFilter);
 
   let bonds = $state<Bond[]>([]);

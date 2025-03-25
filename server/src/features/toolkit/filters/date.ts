@@ -1,17 +1,19 @@
 import dayjs from "dayjs";
 import type { z } from "zod";
 import type { DateFilterSchema } from "./date.schema.ts";
+import { isNullish } from "../isNullish.ts";
 
 export type DateFilter = z.infer<typeof DateFilterSchema>;
 
 export function dateFilter(value?: Date, filter?: DateFilter) {
-  if (!filter || value === undefined) return true;
+  if (isNullish(filter)) return true;
+  if (isNullish(value)) return !filter.exists;
 
   const d = dayjs(value);
-  const { min, max, unit } = filter;
 
-  if (min && d.isBefore(min, unit)) return false;
-  if (max && d.isAfter(max, unit)) return false;
-
-  return true;
+  return (
+    filter.exists !== false &&
+    (isNullish(filter.gte) || !d.isBefore(filter.gte, filter.unit)) &&
+    (isNullish(filter.lte) || !d.isAfter(filter.lte, filter.unit))
+  );
 }

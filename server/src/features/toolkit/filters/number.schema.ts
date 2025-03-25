@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const NumberFilterSchema = z.object({
-  min: z.number().optional(),
-  max: z.number().optional(),
+  gte: z.number().optional(),
+  lte: z.number().optional(),
+  exists: z.boolean().optional(),
 });

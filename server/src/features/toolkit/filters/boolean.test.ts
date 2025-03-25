@@ -2,18 +2,18 @@ import { it } from "node:test";
 import assert from "node:assert";
 import { booleanFilter } from "./boolean.ts";
 
-it("returns true if value or filter is undefined", () => {
-  assert.strictEqual(booleanFilter(undefined, undefined), true);
+it("should return true when filter is nullish", () => {
   assert.strictEqual(booleanFilter(true, undefined), true);
-  assert.strictEqual(booleanFilter(undefined, false), true);
+  assert.strictEqual(booleanFilter(false, undefined), true);
 });
 
-it("returns true when value matches filter", () => {
-  assert.strictEqual(booleanFilter(true, true), true);
-  assert.strictEqual(booleanFilter(false, false), true);
+it('should return based on "exists" when value is nullish', () => {
+  assert.strictEqual(booleanFilter(undefined, { exists: true }), false);
+  assert.strictEqual(booleanFilter(undefined, { exists: false }), true);
 });
 
-it("returns false when value does not match filter", () => {
-  assert.strictEqual(booleanFilter(true, false), false);
-  assert.strictEqual(booleanFilter(false, true), false);
+it("should compare value with filter.eq when value is defined", () => {
+  assert.strictEqual(booleanFilter(true, { eq: true }), true);
+  assert.strictEqual(booleanFilter(true, { eq: false }), false);
+  assert.strictEqual(booleanFilter(true, { exists: false, eq: true }), false);
 });

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const StringFilterSchema = z.object({
-  include: z.array(z.string()).optional(),
-  exclude: z.array(z.string()).optional(),
+  in: z.array(z.string()).optional(),
+  nin: z.array(z.string()).optional(),
+  exists: z.boolean().optional(),
 });

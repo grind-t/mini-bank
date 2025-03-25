@@ -2,37 +2,43 @@ import { it } from "node:test";
 import assert from "node:assert";
 import { stringFilter } from "./string.ts";
 
-it("returns true if no filter provided", () => {
-  const result = stringFilter("any value");
+it("should return true if filter is undefined", () => {
+  const result = stringFilter("any", undefined);
   assert.strictEqual(result, true);
 });
 
-it("returns true when value is in include array", () => {
-  const filter = { include: ["hello", "world"] };
-  const result = stringFilter("hello", filter);
+it("should handle value nullish by returning !filter.exists", () => {
+  let result = stringFilter(undefined, { exists: true });
+  assert.strictEqual(result, false);
+  result = stringFilter(undefined, { exists: false });
   assert.strictEqual(result, true);
 });
 
-it("returns false when value is not in include array", () => {
-  const filter = { include: ["foo", "bar"] };
-  const result = stringFilter("hello", filter);
+it("should return false when filter.exists is false even if value is provided", () => {
+  const result = stringFilter("anything", { exists: false });
   assert.strictEqual(result, false);
 });
 
-it("returns false when value is in exclude array", () => {
-  const filter = { exclude: ["test", "hello"] };
-  const result = stringFilter("hello", filter);
-  assert.strictEqual(result, false);
-});
-
-it("returns true when value is in include but not in exclude", () => {
-  const filter = { include: ["test"], exclude: ["hello"] };
+it("should return true when value is in filter.in and not in filter.nin", () => {
+  const filter = { in: ["test", "foo"], nin: ["bar"] };
   const result = stringFilter("test", filter);
   assert.strictEqual(result, true);
 });
 
-it("returns false when value is in both include and exclude", () => {
-  const filter = { include: ["test"], exclude: ["test"] };
+it("should return false when value is not in filter.in", () => {
+  const filter = { in: ["test", "foo"] };
+  const result = stringFilter("other", filter);
+  assert.strictEqual(result, false);
+});
+
+it("should return false when value is in filter.nin", () => {
+  const filter = { nin: ["test"] };
   const result = stringFilter("test", filter);
   assert.strictEqual(result, false);
+});
+
+it("should return true when value is not in filter.nin", () => {
+  const filter = { nin: ["test"] };
+  const result = stringFilter("other", filter);
+  assert.strictEqual(result, true);
 });

@@ -23,4 +23,10 @@ await $`yc serverless container revision deploy ${[
   "ajec3fo74rnuq5q72g5j",
   "--environment",
   envKeys.map((key) => `${key}=${process.env[key]}`).join(","),
+  "--memory",
+  "512MB",
+  "--execution-timeout",
+  "10s",
+  "--concurrency",
+  "8",
 ]}`;

@@ -1,6 +1,6 @@
 import type z from "zod";
 import type { NumberFilterSchema } from "./number.schema.ts";
-import { isNullish } from "../isNullish.ts";
+import { isNullish } from "../toolkit/isNullish.ts";
 
 export type NumberFilter = z.infer<typeof NumberFilterSchema>;
 

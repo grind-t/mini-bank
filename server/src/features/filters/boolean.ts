@@ -1,6 +1,6 @@
 import type z from "zod";
 import { BooleanFilterSchema } from "./boolean.schema.ts";
-import { isNullish } from "../isNullish.ts";
+import { isNullish } from "../toolkit/isNullish.ts";
 
 export type BooleanFilter = z.infer<typeof BooleanFilterSchema>;
 

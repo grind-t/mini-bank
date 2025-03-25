@@ -1,7 +1,7 @@
-import { booleanFilter } from "#src/features/toolkit/filters/boolean.ts";
-import { dateFilter } from "#src/features/toolkit/filters/date.ts";
-import { numberFilter } from "#src/features/toolkit/filters/number.ts";
-import { stringFilter } from "#src/features/toolkit/filters/string.ts";
+import { booleanFilter } from "#src/features/filters/boolean.ts";
+import { dateFilter } from "#src/features/filters/date.ts";
+import { numberFilter } from "#src/features/filters/number.ts";
+import { stringFilter } from "#src/features/filters/string.ts";
 import type { z } from "zod";
 import { listAllBonds } from "./listAll.ts";
 import type { BondListFilterSchema } from "./list.schema.ts";

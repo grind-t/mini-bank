@@ -56,16 +56,21 @@ export async function executeDCAStrategy(
 
     if (quantity > 0) {
       orders.push(
-        tInvestApi.orders.postOrder({
-          quantity,
-          direction: OrderDirection.ORDER_DIRECTION_BUY,
-          accountId,
-          orderType: OrderType.ORDER_TYPE_MARKET,
-          orderId: crypto.randomUUID(),
-          instrumentId: assets[i].id,
-          timeInForce: TimeInForceType.TIME_IN_FORCE_UNSPECIFIED,
-          priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
-        })
+        tInvestApi.orders
+          .postOrder({
+            quantity,
+            direction: OrderDirection.ORDER_DIRECTION_BUY,
+            accountId,
+            orderType: OrderType.ORDER_TYPE_MARKET,
+            orderId: crypto.randomUUID(),
+            instrumentId: assets[i].id,
+            timeInForce: TimeInForceType.TIME_IN_FORCE_UNSPECIFIED,
+            priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
+          })
+          .catch((e) => {
+            const msg = `${strategy.assets[i].id} ${assets[i].id} ${e?.message}`;
+            throw new Error(msg);
+          })
       );
     }
   }

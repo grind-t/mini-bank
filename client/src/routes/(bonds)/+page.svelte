@@ -38,6 +38,7 @@
     sector: {
       nin: ["real_estate"],
     },
+    hasAmortization: { eq: false },
     hasOffer: { eq: false },
     forQual: { eq: false },
   } satisfies BondListFilter);

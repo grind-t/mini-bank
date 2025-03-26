@@ -18,12 +18,13 @@ export type Bond = {
   };
   currency: string;
   sector: string;
+  hasAmortization: boolean;
   hasOffer: boolean;
   forQual: boolean;
 };
 
 export async function listAllBonds(): Promise<Bond[]> {
-  return withCache("bonds_cache", { hours: 1 }, async () => {
+  return withCache("bonds_cache", { minutes: 30 }, async () => {
     const [bonds, report, yields] = await Promise.all([
       tInvestApi.instruments.bonds({}).then((v) => v.instruments),
       getBondFinderReport().then((v) => toRecord(v, (v) => v.isin)),
@@ -51,6 +52,7 @@ export async function listAllBonds(): Promise<Bond[]> {
           },
           currency: bond.currency,
           sector: bond.sector,
+          hasAmortization: bond.amortizationFlag,
           hasOffer: !!bond.callDate || !!reportItem?.has_offer,
           forQual: bond.forQualInvestorFlag || !!reportItem?.qual,
         });

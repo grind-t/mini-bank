@@ -23,6 +23,7 @@ export async function listBonds(filter?: BondListFilter) {
         dateFilter(bond.maturityDate, filter.maturityDate) &&
         stringFilter(bond.currency, filter.currency) &&
         stringFilter(bond.sector, filter.sector) &&
+        booleanFilter(bond.hasAmortization, filter.hasAmortization) &&
         booleanFilter(bond.hasOffer, filter.hasOffer) &&
         booleanFilter(bond.forQual, filter.forQual))
   );

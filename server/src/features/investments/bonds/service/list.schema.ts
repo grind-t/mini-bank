@@ -17,6 +17,7 @@ export const BondListFilterSchema = z.object({
   maturityDate: DateFilterSchema.optional(),
   currency: StringFilterSchema.optional(),
   sector: StringFilterSchema.optional(),
+  hasAmortization: BooleanFilterSchema.optional(),
   hasOffer: BooleanFilterSchema.optional(),
   forQual: BooleanFilterSchema.optional(),
 });

@@ -13,6 +13,7 @@
   import BondListItem from "./BondListItem.svelte";
   import CurrentMonthBudget from "./CurrentMonthBudget.svelte";
   import dayjs from "dayjs";
+  import { toRecord } from "@grind-t/toolkit";
 
   let filter = $state({
     whitelist: [] as string[],
@@ -50,9 +51,7 @@
     assets: [],
   });
 
-  let assetsMap = $derived(
-    Object.fromEntries(strategy.assets.map((v) => [v.id, v]))
-  );
+  let assetsMap = $derived(toRecord(strategy.assets, (v) => v.id));
 
   let [selectedBonds, restBonds] = $derived(
     bonds.reduce(

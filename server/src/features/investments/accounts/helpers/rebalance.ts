@@ -1,4 +1,4 @@
-import { sum } from "#src/features/toolkit/sum.ts";
+import { sum } from "@grind-t/toolkit";
 import type { InvestAccountAsset } from "../model.ts";
 
 export function rebalanceInvestAccount(

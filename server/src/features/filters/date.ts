@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import type { z } from "zod";
 import type { DateFilterSchema } from "./date.schema.ts";
-import { isNullish } from "../toolkit/isNullish.ts";
+import { isNullish } from "@grind-t/toolkit";
 
 export type DateFilter = z.infer<typeof DateFilterSchema>;
 

@@ -18,9 +18,8 @@ import { Helpers } from "tinkoff-invest-api";
 import { setDCAStrategy } from "./set.ts";
 import { getMoexTradingDays } from "../../integrations/moex/getTradingDays.ts";
 import dayjs from "dayjs";
-import { splitSettled } from "#src/features/toolkit/splitSettled.ts";
+import { sum, splitSettled } from "@grind-t/toolkit";
 import { TRPCError } from "@trpc/server";
-import { sum } from "#src/features/toolkit/sum.ts";
 
 export async function executeDCAStrategy(
   strategy: DCAStrategy,

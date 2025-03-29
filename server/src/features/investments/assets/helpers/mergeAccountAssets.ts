@@ -1,4 +1,4 @@
-import { toRecord } from "#src/features/toolkit/toRecord.ts";
+import { toRecord } from "@grind-t/toolkit";
 import type { InvestAccountAsset } from "../../accounts/model.ts";
 import type { Asset } from "../model.ts";
 import { mergeAccountAsset } from "./mergeAccountAsset.ts";

@@ -1,4 +1,4 @@
-import { toRecord } from "#src/features/toolkit/toRecord.ts";
+import { toRecord } from "@grind-t/toolkit";
 import { withCache } from "#src/redis.ts";
 import {
   getBondFinderReport,

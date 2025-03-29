@@ -1,4 +1,4 @@
-import { toRecord } from "#src/features/toolkit/toRecord.ts";
+import { toRecord } from "@grind-t/toolkit";
 
 export type BondFinderReportItem = {
   isin: string;

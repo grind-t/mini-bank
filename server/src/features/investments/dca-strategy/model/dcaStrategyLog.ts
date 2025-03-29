@@ -1,5 +1,5 @@
 import type { InvestAccountAsset } from "../../accounts/model.ts";
-import type { DCAStrategy } from "./dca-strategy.ts";
+import type { DCAStrategy } from "./dcaStrategy.ts";
 
 export type DCAStrategyLogPayload = {
   strategy: DCAStrategy;

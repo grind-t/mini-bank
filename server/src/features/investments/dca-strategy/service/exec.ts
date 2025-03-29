@@ -8,9 +8,9 @@ import {
 } from "tinkoff-invest-api/cjs/generated/orders.js";
 import { rebalanceInvestAccount } from "../../accounts/helpers/rebalance.ts";
 import { getInvestAccountFromTInvestApi } from "../../accounts/service/getFromTInvestApi.ts";
-import { getAssetsFromTInvestApi } from "../../assets/service/get-from-tinvest-api.ts";
+import { getAssetsFromTInvestApi } from "../../assets/service/getFromTInvestApi.ts";
 import { getDCAStrategyAssetsRatios } from "../helpers/getAssetsRatio.ts";
-import type { DCAStrategy } from "../model/dca-strategy.ts";
+import type { DCAStrategy } from "../model/dcaStrategy.ts";
 import { PriceType } from "tinkoff-invest-api/cjs/generated/common.js";
 import { logDCAStrategy } from "./log.ts";
 import { mergeAccountAssets } from "../../assets/helpers/mergeAccountAssets.ts";

@@ -4,7 +4,7 @@ import { getDCAStrategy } from "./service/get.ts";
 import { setDCAStrategy } from "./service/set.ts";
 import { TRPCError } from "@trpc/server";
 import { executeDCAStrategy } from "./service/exec.ts";
-import { getDCAStrategyLogs } from "./service/get-logs.ts";
+import { getDCAStrategyLogs } from "./service/getLogs.ts";
 
 export const dcaStrategies = {
   get: publicProcedure

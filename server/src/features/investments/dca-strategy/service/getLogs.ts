@@ -2,7 +2,7 @@ import { redis } from "#src/redis.ts";
 import {
   dcaStrategiesLogsKey,
   type DCAStrategyLog,
-} from "../model/dca-strategy-log.ts";
+} from "../model/dcaStrategyLog.ts";
 
 export async function getDCAStrategyLogs(
   id: string,

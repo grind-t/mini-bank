@@ -1,5 +1,5 @@
 import { sum } from "@grind-t/toolkit";
-import type { DCAStrategyAsset } from "../model/dca-strategy.ts";
+import type { DCAStrategyAsset } from "../model/dcaStrategy.ts";
 
 export function getDCAStrategyAssetsRatios(
   assets: DCAStrategyAsset[]

@@ -18,6 +18,7 @@ export type Bond = {
   };
   currency: string;
   sector: string;
+  isFloater: boolean;
   hasAmortization: boolean;
   hasOffer: boolean;
   forQual: boolean;
@@ -52,6 +53,7 @@ export async function listAllBonds(): Promise<Bond[]> {
           },
           currency: bond.currency,
           sector: bond.sector,
+          isFloater: bond.floatingCouponFlag,
           hasAmortization: bond.amortizationFlag,
           hasOffer: !!bond.callDate || !!reportItem?.has_offer,
           forQual: bond.forQualInvestorFlag || !!reportItem?.qual,

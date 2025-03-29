@@ -69,7 +69,7 @@
         <div>{getTInvestBondRatingText(bond.rating.tInvest)}</div>
       {/if}
     </div>
-    <div class="flex-2">{bond.yield}%</div>
+    <div class="flex-2">{bond.isFloater ? "~" : ""}{bond.yield}%</div>
     <div class="flex-2">
       {#if bond.maturityDate}
         {getDistanceInYearsText(new Date(bond.maturityDate))}

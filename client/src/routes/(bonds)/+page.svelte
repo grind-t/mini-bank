@@ -34,6 +34,7 @@
     },
     maturityDate: {
       lte: dayjs().add(2, "years").toDate() as Date | undefined,
+      gte: dayjs().add(1, "month").toDate() as Date | undefined,
       unit: "day",
     },
     currency: {

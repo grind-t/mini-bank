@@ -29,6 +29,9 @@
         gte: 4 as number | undefined,
       },
     },
+    nominal: {
+      lte: 10000,
+    },
     maturityDate: {
       lte: dayjs().add(2, "years").toDate() as Date | undefined,
       unit: "day",

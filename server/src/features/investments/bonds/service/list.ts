@@ -20,6 +20,7 @@ export async function listBonds(filter?: BondListFilter) {
         numberFilter(bond.yield, filter.yield) &&
         numberFilter(bond.rating.tInvest, filter.rating?.tInvest) &&
         numberFilter(bond.rating.bondFinder, filter.rating?.bondFinder) &&
+        numberFilter(bond.nominal, filter.nominal) &&
         dateFilter(bond.maturityDate, filter.maturityDate) &&
         stringFilter(bond.currency, filter.currency) &&
         stringFilter(bond.sector, filter.sector) &&

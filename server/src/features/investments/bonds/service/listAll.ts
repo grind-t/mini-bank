@@ -6,6 +6,7 @@ import {
 } from "../../integrations/bond-finder/report.ts";
 import { getMoexBondsMarketYield } from "../../integrations/moex/getBondsMarketYield.ts";
 import tInvestApi from "../../integrations/t-invest-api/core.ts";
+import { Helpers } from "tinkoff-invest-api";
 
 export type Bond = {
   isin: string;
@@ -16,6 +17,7 @@ export type Bond = {
     tInvest?: number;
     bondFinder?: number;
   };
+  nominal?: number;
   currency: string;
   sector: string;
   isFloater: boolean;
@@ -51,6 +53,7 @@ export async function listAllBonds(): Promise<Bond[]> {
             tInvest: bond.riskLevel < 1 ? undefined : 3 - bond.riskLevel,
             bondFinder: reportItem?.rating,
           },
+          nominal: Helpers.toNumber(bond.nominal),
           currency: bond.currency,
           sector: bond.sector,
           isFloater: bond.floatingCouponFlag,

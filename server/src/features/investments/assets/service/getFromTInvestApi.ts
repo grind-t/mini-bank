@@ -1,8 +1,11 @@
 import type { Asset } from "../model.ts";
 import tInvestApi from "#features/investments/integrations/t-invest-api/core.ts";
 import { getAssetPriceFromTInvestApi } from "./getPriceFromTInvestApi.ts";
+import { isNullish } from "@grind-t/toolkit";
 
-export async function getAssetFromTInvestApi(id: string): Promise<Asset> {
+export async function getAssetFromTInvestApi(
+  id: string
+): Promise<Asset | null> {
   const instrument = await tInvestApi.instruments
     .findInstrument({
       query: id,
@@ -10,13 +13,19 @@ export async function getAssetFromTInvestApi(id: string): Promise<Asset> {
     })
     .then((v) => v.instruments[0]);
 
-  if (!instrument) {
-    throw new Error(`Unable to find instrument ${id}`);
+  if (isNullish(instrument)) {
+    return null;
+  }
+
+  const currentPrice = await getAssetPriceFromTInvestApi(instrument);
+
+  if (isNullish(currentPrice)) {
+    return null;
   }
 
   return {
     id: instrument.uid,
-    currentPrice: await getAssetPriceFromTInvestApi(instrument),
+    currentPrice,
   };
 }
 

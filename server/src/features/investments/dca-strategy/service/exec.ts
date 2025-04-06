@@ -18,17 +18,18 @@ import { Helpers } from "tinkoff-invest-api";
 import { setDCAStrategy } from "./set.ts";
 import { getMoexTradingDays } from "../../integrations/moex/getTradingDays.ts";
 import dayjs from "dayjs";
-import { sum, splitSettled } from "@grind-t/toolkit";
+import { sum, splitSettled, isNullish } from "@grind-t/toolkit";
 import { TRPCError } from "@trpc/server";
 
 export async function executeDCAStrategy(
   strategy: DCAStrategy,
   accountId: string
 ) {
-  const assetsPromise = Promise.all([
-    getInvestAccountFromTInvestApi(accountId),
-    getAssetsFromTInvestApi(strategy.assets.map((v) => v.id)),
-  ]).then(([account, assets]) => mergeAccountAssets(assets, account.assets));
+  const accountPromise = getInvestAccountFromTInvestApi(accountId);
+
+  const assetsPromise = getAssetsFromTInvestApi(
+    strategy.assets.map((v) => v.id)
+  );
 
   const budgetPromise = getMoexTradingDays(
     dayjs(),
@@ -45,13 +46,29 @@ export async function executeDCAStrategy(
     return budget;
   });
 
-  const [assets, budget] = await Promise.all([assetsPromise, budgetPromise]);
+  const [account, assets, budget] = await Promise.all([
+    accountPromise,
+    assetsPromise,
+    budgetPromise,
+  ]);
+
+  const initialAssets = mergeAccountAssets(
+    assets.filter((v) => !isNullish(v)),
+    account.assets
+  );
+
   const targetRatios = getDCAStrategyAssetsRatios(strategy.assets);
-  const rebalancedAssets = rebalanceInvestAccount(assets, targetRatios, budget);
+
+  const rebalancedAssets = rebalanceInvestAccount(
+    initialAssets,
+    targetRatios,
+    budget
+  );
+
   const orders: Promise<PostOrderResponse>[] = [];
 
-  for (let i = 0; i < assets.length; i++) {
-    const quantity = rebalancedAssets[i].quantity - assets[i].quantity;
+  for (let i = 0; i < initialAssets.length; i++) {
+    const quantity = rebalancedAssets[i].quantity - initialAssets[i].quantity;
 
     if (quantity > 0) {
       orders.push(
@@ -62,12 +79,12 @@ export async function executeDCAStrategy(
             accountId,
             orderType: OrderType.ORDER_TYPE_MARKET,
             orderId: crypto.randomUUID(),
-            instrumentId: assets[i].id,
+            instrumentId: initialAssets[i].id,
             timeInForce: TimeInForceType.TIME_IN_FORCE_UNSPECIFIED,
             priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
           })
           .catch((e) => {
-            const msg = `${strategy.assets[i].id} ${assets[i].id} ${e?.message}`;
+            const msg = `${strategy.assets[i].id} ${initialAssets[i].id} ${e?.message}`;
             throw new Error(msg);
           })
       );
@@ -75,6 +92,7 @@ export async function executeDCAStrategy(
   }
 
   const [fulfilledOrders, rejectedOrders] = await splitSettled(orders);
+
   const spent = sum(
     fulfilledOrders,
     (v) => Helpers.toNumber(v.totalOrderAmount) || 0
@@ -83,13 +101,14 @@ export async function executeDCAStrategy(
   repoTransfer({ accountId, direction: OrderDirection.ORDER_DIRECTION_BUY });
 
   setDCAStrategy({
-    ...strategy,
+    id: strategy.id,
+    assets: strategy.assets.filter((_, i) => !isNullish(assets[i])),
     currentMonthBudget: strategy.currentMonthBudget - spent,
   });
 
   logDCAStrategy({
     strategy,
-    initialAssets: assets,
+    initialAssets,
     budget,
     spent,
     rebalancedAssets,

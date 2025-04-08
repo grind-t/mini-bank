@@ -25,9 +25,6 @@ const trpc = createTRPCClient<AppRouter>({
 });
 
 export const getBonds = trpc.bonds.list.query;
-export const getHiddenBonds = trpc.bonds.getHidden.query;
-export const hideBond = trpc.bonds.hide.mutate;
-export const showBond = trpc.bonds.show.mutate;
 export const getDCAStrategy = trpc.dcaStrategies.get.query;
 export const setDCAStrategy = trpc.dcaStrategies.set.mutate;
 export const executeDCAStrategy = trpc.dcaStrategies.execute.mutate;
@@ -40,3 +37,6 @@ export type DCAStrategy = Exclude<
   null
 >;
 export type DCAStrategyAsset = DCAStrategy["assets"][number];
+export type DCAStrategyLog = Awaited<
+  ReturnType<typeof getDCAStrategyLogs>
+>[number];

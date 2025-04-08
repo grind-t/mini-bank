@@ -1,14 +1,13 @@
 import type { InvestAccountAsset } from "../../accounts/model.ts";
+import type { Asset } from "../../assets/model.ts";
 import type { DCAStrategy } from "./dcaStrategy.ts";
 
 export type DCAStrategyLogPayload = {
   strategy: DCAStrategy;
-  initialAssets: InvestAccountAsset[];
   budget: number;
-  spent: number;
+  initialAssets: InvestAccountAsset[];
   rebalancedAssets: InvestAccountAsset[];
-  orderIds: string[];
-  orderErrors: string[];
+  orderedAssets: (Asset & { quantity: number; error?: string })[];
 };
 
 export type DCAStrategyLog = DCAStrategyLogPayload & { timestamp: number };

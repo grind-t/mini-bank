@@ -1,25 +1,19 @@
-import tInvestApi from "#features/investments/integrations/t-invest-api/core.ts";
 import { repoTransfer } from "#features/investments/integrations/t-invest-api/service/repo.ts";
-import {
-  OrderDirection,
-  OrderType,
-  PostOrderResponse,
-  TimeInForceType,
-} from "tinkoff-invest-api/cjs/generated/orders.js";
+import { OrderDirection } from "tinkoff-invest-api/cjs/generated/orders.js";
 import { rebalanceInvestAccount } from "../../accounts/helpers/rebalance.ts";
 import { getInvestAccountFromTInvestApi } from "../../accounts/service/getFromTInvestApi.ts";
 import { getAssetsFromTInvestApi } from "../../assets/service/getFromTInvestApi.ts";
 import { getDCAStrategyAssetsRatios } from "../helpers/getAssetsRatio.ts";
 import type { DCAStrategy } from "../model/dcaStrategy.ts";
-import { PriceType } from "tinkoff-invest-api/cjs/generated/common.js";
 import { logDCAStrategy } from "./log.ts";
 import { mergeAccountAssets } from "../../assets/helpers/mergeAccountAssets.ts";
-import { Helpers } from "tinkoff-invest-api";
 import { setDCAStrategy } from "./set.ts";
 import { getMoexTradingDays } from "../../integrations/moex/getTradingDays.ts";
 import dayjs from "dayjs";
-import { sum, splitSettled, isNullish } from "@grind-t/toolkit";
+import { sum, isNullish } from "@grind-t/toolkit";
 import { TRPCError } from "@trpc/server";
+import { orderFromTInvestApi } from "../../orders/service/orderFromTInvestApi.ts";
+import type { OrderedAsset } from "../../orders/model.ts";
 
 export async function executeDCAStrategy(
   strategy: DCAStrategy,
@@ -65,38 +59,23 @@ export async function executeDCAStrategy(
     budget
   );
 
-  const orders: Promise<PostOrderResponse>[] = [];
+  const orderPromises: Promise<OrderedAsset>[] = initialAssets.reduce(
+    (acc: Promise<OrderedAsset>[], _, i) => {
+      const initialAsset = initialAssets[i];
+      const rebalancedAsset = rebalancedAssets[i];
+      const diff = rebalancedAsset.quantity - initialAsset.quantity;
 
-  for (let i = 0; i < initialAssets.length; i++) {
-    const quantity = rebalancedAssets[i].quantity - initialAssets[i].quantity;
+      if (diff > 0) {
+        acc.push(orderFromTInvestApi(accountId, initialAsset, diff));
+      }
 
-    if (quantity > 0) {
-      orders.push(
-        tInvestApi.orders
-          .postOrder({
-            quantity,
-            direction: OrderDirection.ORDER_DIRECTION_BUY,
-            accountId,
-            orderType: OrderType.ORDER_TYPE_MARKET,
-            orderId: crypto.randomUUID(),
-            instrumentId: initialAssets[i].id,
-            timeInForce: TimeInForceType.TIME_IN_FORCE_UNSPECIFIED,
-            priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
-          })
-          .catch((e) => {
-            const msg = `${strategy.assets[i].id} ${initialAssets[i].id} ${e?.message}`;
-            throw new Error(msg);
-          })
-      );
-    }
-  }
-
-  const [fulfilledOrders, rejectedOrders] = await splitSettled(orders);
-
-  const spent = sum(
-    fulfilledOrders,
-    (v) => Helpers.toNumber(v.totalOrderAmount) || 0
+      return acc;
+    },
+    []
   );
+
+  const orderedAssets = await Promise.all(orderPromises);
+  const spent = sum(orderedAssets, (v) => v.currentPrice * v.quantity);
 
   repoTransfer({ accountId, direction: OrderDirection.ORDER_DIRECTION_BUY });
 
@@ -110,13 +89,11 @@ export async function executeDCAStrategy(
     strategy,
     initialAssets,
     budget,
-    spent,
     rebalancedAssets,
-    orderIds: fulfilledOrders.map((v) => v.orderId),
-    orderErrors: rejectedOrders.map((v) => v?.message),
+    orderedAssets,
   });
 
-  if (rejectedOrders.length) {
+  if (orderedAssets.some((v) => v.error)) {
     throw new TRPCError({
       message: "Some orders failed, see logs",
       code: "INTERNAL_SERVER_ERROR",

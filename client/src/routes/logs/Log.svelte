@@ -27,8 +27,9 @@
       </div>
     {:else}
       <div class="chat-bubble chat-bubble-success">
-        Покупка {asset.name}, {asset.quantity} шт. на {asset.currentPrice *
-          asset.quantity} руб.
+        Покупка {asset.name}, {asset.quantity} шт. на {(
+          asset.currentPrice * asset.quantity
+        ).toFixed(2)} руб.
       </div>
     {/if}
   </div>

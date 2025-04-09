@@ -1,5 +1,5 @@
 export type DCAStrategyAsset = {
-  id: string;
+  isin: string;
   weight: number;
 };
 

@@ -21,7 +21,7 @@ export const dcaStrategies = {
       z.object({
         id: z.string(),
         currentMonthBudget: z.number(),
-        assets: z.array(z.object({ id: z.string(), weight: z.number() })),
+        assets: z.array(z.object({ isin: z.string(), weight: z.number() })),
       })
     )
     .mutation(async ({ input }) => {

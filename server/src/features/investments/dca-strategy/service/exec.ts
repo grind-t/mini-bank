@@ -22,7 +22,7 @@ export async function executeDCAStrategy(
   const accountPromise = getInvestAccountFromTInvestApi(accountId);
 
   const assetsPromise = getAssetsFromTInvestApi(
-    strategy.assets.map((v) => v.id)
+    strategy.assets.map((v) => v.isin)
   );
 
   const budgetPromise = getMoexTradingDays(

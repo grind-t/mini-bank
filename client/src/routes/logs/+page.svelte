@@ -11,9 +11,9 @@
       to: dayjs().toDate(),
     });
 
-    const allBondIds = logs.reduce((set, log) => {
+    const whitelist = logs.reduce((set, log) => {
       log.strategy.assets.forEach((v) => {
-        set.add(v.id);
+        set.add(v.isin);
       });
 
       return set;
@@ -21,7 +21,7 @@
 
     const bonds = await getBonds({
       filter: {
-        whitelist: Array.from(allBondIds),
+        whitelist: Array.from(whitelist),
         yield: {
           lte: -1,
         },
@@ -34,8 +34,10 @@
 
 <div class="flex flex-col h-full">
   {#await getData() then [logs, bonds]}
+    {@const getAssetBody = (isin: string) => bonds[isin]}
+
     {#each logs as log}
-      <Log {log} assets={bonds} />
+      <Log {log} {getAssetBody} />
     {:else}
       Логи отсутсвуют
     {/each}

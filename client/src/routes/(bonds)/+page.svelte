@@ -55,7 +55,7 @@
     assets: [],
   });
 
-  let assetsMap = $derived(toRecord(strategy.assets, (v) => v.id));
+  let assetsMap = $derived(toRecord(strategy.assets, (v) => v.isin));
 
   let [selectedBonds, restBonds] = $derived(
     bonds.reduce(
@@ -76,7 +76,7 @@
 
   onMount(async () => {
     strategy = (await getDCAStrategy({ id: "bonds" })) ?? strategy;
-    filter.whitelist = strategy.assets.map((v) => v.id);
+    filter.whitelist = strategy.assets.map((v) => v.isin);
     bonds = await getBonds({ filter });
   });
 

@@ -4,21 +4,22 @@
 
   let {
     log,
-    assets,
-  }: { log: DCAStrategyLog; assets: Record<string, { name: string }> } =
+    getAssetBody,
+  }: { log: DCAStrategyLog; getAssetBody: (isin: string) => { name: string } } =
     $props();
 
-  function getAssetBody(orederedAssetId: string) {
-    const idx = log.initialAssets.findIndex((v) => v.id === orederedAssetId);
-    const assetId = log.strategy.assets[idx].id;
-    return assets[assetId];
+  function getAsset(orderedAsset: (typeof log.orderedAssets)[number]) {
+    const idx = log.initialAssets.findIndex((v) => v.id === orderedAsset.id);
+    const isin = log.strategy.assets[idx].isin;
+    const body = getAssetBody(isin);
+    return { ...body, ...orderedAsset };
   }
 </script>
 
 <div class="divider">{dayjs(log.timestamp).format("DD.MM.YYYY HH:mm")}</div>
 
 {#each log.orderedAssets as orderedAsset}
-  {@const asset = { ...getAssetBody(orderedAsset.id), ...orderedAsset }}
+  {@const asset = getAsset(orderedAsset)}
 
   <div class="chat chat-start">
     {#if "error" in orderedAsset}

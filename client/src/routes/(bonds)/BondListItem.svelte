@@ -30,7 +30,7 @@
           e.preventDefault();
 
           if (!strategyAsset) {
-            onAddToStrategy?.({ id: bond.isin, weight: 1 });
+            onAddToStrategy?.({ isin: bond.isin, weight: 1 });
           } else {
             onRemoveFromStrategy?.(strategyAsset);
           }

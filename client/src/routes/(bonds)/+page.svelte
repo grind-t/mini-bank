@@ -10,10 +10,11 @@
     type DCAStrategyAsset,
   } from "$lib/common/api";
   import BondList from "./BondList.svelte";
-  import BondListItem from "./BondListItem.svelte";
   import CurrentMonthBudget from "./CurrentMonthBudget.svelte";
   import dayjs from "dayjs";
   import { toRecord } from "@grind-t/toolkit";
+  import BondListRow from "./BondListRow.svelte";
+  import BondListHeader from "./BondListHeader.svelte";
 
   let filter = $state({
     whitelist: [] as string[],
@@ -102,8 +103,9 @@
       }}
     />
     <BondList>
+      <BondListHeader {selectedBonds} />
       {#each selectedBonds as bond (bond.isin)}
-        <BondListItem
+        <BondListRow
           {bond}
           strategyAsset={assetsMap[bond.isin]}
           onAddToStrategy={onAddBondToStrategy}
@@ -111,7 +113,7 @@
         />
       {/each}
       {#each restBonds as bond (bond.isin)}
-        <BondListItem
+        <BondListRow
           {bond}
           onAddToStrategy={onAddBondToStrategy}
           onRemoveFromStrategy={onRemoveBondFromStrategy}

@@ -30,12 +30,16 @@ export async function orderFromTInvestApi(
 
     return {
       id: asset.id,
+      isin: asset.isin,
+      name: asset.name,
       currentPrice: total / order.lotsExecuted,
       quantity: order.lotsExecuted,
     };
   } catch (e: any) {
     return {
       id: asset.id,
+      isin: asset.isin,
+      name: asset.name,
       currentPrice: 0,
       quantity: 0,
       error: e?.message || "",

@@ -25,6 +25,8 @@ export async function getAssetFromTInvestApi(
 
   return {
     id: instrument.uid,
+    isin: instrument.isin,
+    name: instrument.name,
     currentPrice,
   };
 }

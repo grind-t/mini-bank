@@ -1,11 +1,14 @@
 import { toRecord } from "@grind-t/toolkit";
-import type { InvestAccountAsset } from "../../accounts/model.ts";
+import type {
+  InvestAccountAsset,
+  InvestAccountAssetShort,
+} from "../../accounts/model.ts";
 import type { Asset } from "../model.ts";
 import { mergeAccountAsset } from "./mergeAccountAsset.ts";
 
 export function mergeAccountAssets(
   assets: Asset[],
-  accountAssets: InvestAccountAsset[]
+  accountAssets: InvestAccountAssetShort[]
 ): InvestAccountAsset[] {
   const accountAssetsRecord = toRecord(accountAssets, (item) => item.id);
 

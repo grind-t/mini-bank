@@ -2,11 +2,8 @@ import { booleanFilter } from "#src/features/filters/boolean.ts";
 import { dateFilter } from "#src/features/filters/date.ts";
 import { numberFilter } from "#src/features/filters/number.ts";
 import { stringFilter } from "#src/features/filters/string.ts";
-import type { z } from "zod";
+import type { BondListFilter } from "../model/bondListFilter.ts";
 import { listAllBonds } from "./listAll.ts";
-import type { BondListFilterSchema } from "./list.schema.ts";
-
-export type BondListFilter = z.infer<typeof BondListFilterSchema>;
 
 export async function listBonds(filter?: BondListFilter) {
   const allBonds = await listAllBonds();

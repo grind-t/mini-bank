@@ -7,24 +7,7 @@ import {
 import { getMoexBondsMarketYield } from "../../integrations/moex/getBondsMarketYield.ts";
 import tInvestApi from "../../integrations/t-invest-api/core.ts";
 import { Helpers } from "tinkoff-invest-api";
-
-export type Bond = {
-  isin: string;
-  name: string;
-  maturityDate?: Date;
-  yield: number;
-  rating: {
-    tInvest?: number;
-    bondFinder?: number;
-  };
-  nominal?: number;
-  currency: string;
-  sector: string;
-  isFloater: boolean;
-  hasAmortization: boolean;
-  hasOffer: boolean;
-  forQual: boolean;
-};
+import type { Bond } from "../model/bond.ts";
 
 export async function listAllBonds(): Promise<Bond[]> {
   return withCache("bonds_cache", { minutes: 30 }, async () => {

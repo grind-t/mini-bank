@@ -1,24 +1,11 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "../../../../server/src/main";
-import { user } from "$lib/auth/user.svelte";
+import type { AppRouter } from "../../../../server/src/features/app/trpc/router";
 import SuperJSON from "superjson";
 
 const trpc = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: import.meta.env.DEV
-        ? "http://localhost:3000"
-        : "https://bbac3tn498gvd9kvthnn.containers.yandexcloud.net/",
-      headers: () => ({
-        Authorization: `Basic ${btoa(`${user.name}:${user.password}`)}`,
-        "x-yandex-cloud-authorization": `Basic ${btoa(`${user.name}:${user.password}`)}`,
-      }),
-      fetch(url, options) {
-        return fetch(url, {
-          ...options,
-          credentials: "include",
-        });
-      },
+      url: "/trpc",
       transformer: SuperJSON,
     }),
   ],

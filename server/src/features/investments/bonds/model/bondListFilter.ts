@@ -1,7 +1,7 @@
-import { BooleanFilterSchema } from "#src/features/filters/boolean.schema.ts";
-import { DateFilterSchema } from "#src/features/filters/date.schema.ts";
-import { NumberFilterSchema } from "#src/features/filters/number.schema.ts";
-import { StringFilterSchema } from "#src/features/filters/string.schema.ts";
+import { BooleanFilterSchema } from "#features/filters/boolean.schema.ts";
+import { DateFilterSchema } from "#features/filters/date.schema.ts";
+import { NumberFilterSchema } from "#features/filters/number.schema.ts";
+import { StringFilterSchema } from "#features/filters/string.schema.ts";
 import { z } from "zod";
 
 export const BondListFilterSchema = z.object({

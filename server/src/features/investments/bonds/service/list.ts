@@ -1,7 +1,7 @@
-import { booleanFilter } from "#src/features/filters/boolean.ts";
-import { dateFilter } from "#src/features/filters/date.ts";
-import { numberFilter } from "#src/features/filters/number.ts";
-import { stringFilter } from "#src/features/filters/string.ts";
+import { booleanFilter } from "#features/filters/boolean.ts";
+import { dateFilter } from "#features/filters/date.ts";
+import { numberFilter } from "#features/filters/number.ts";
+import { stringFilter } from "#features/filters/string.ts";
 import type { BondListFilter } from "../model/bondListFilter.ts";
 import { listAllBonds } from "./listAll.ts";
 

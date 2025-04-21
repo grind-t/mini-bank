@@ -1,4 +1,4 @@
-import { redis } from "#src/redis.ts";
+import { redis } from "#app/database/redis.ts";
 import {
   dcaStrategiesLogsKey,
   type DCAStrategyLogPayload,

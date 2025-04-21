@@ -9,7 +9,9 @@ const envKeys = [
   "REDIS_PASSWORD",
   "T_INVEST_READONLY_TOKEN",
   "T_INVEST_FULL_ACCESS_TOKEN",
-  "PASSWORD",
+  "AUTH_GOOGLE_ID",
+  "AUTH_GOOGLE_SECRET",
+  "AUTH_SECRET",
 ];
 
 await $`docker build --provenance false -t ${dockerTag} .`;
@@ -29,4 +31,6 @@ await $`yc serverless container revision deploy ${[
   "10s",
   "--concurrency",
   "8",
+  "--min-instances",
+  "1",
 ]}`;

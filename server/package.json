@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "imports": {
-    "#src/*": "./src/*",
-    "#features/*": "./src/features/*"
+    "#features/*": "./src/features/*",
+    "#app/*": "./src/features/app/*"
   },
   "scripts": {
     "dev": "node --env-file=.env --experimental-transform-types ./src/main.ts",
@@ -14,10 +14,12 @@
     "deploy": "node --env-file=.env --experimental-transform-types ./scripts/deploy.ts"
   },
   "dependencies": {
+    "@auth/express": "^0.9.0",
     "@grind-t/toolkit": "^1.0.1",
     "@trpc/server": "^11.0.0-rc.748",
     "cors": "^2.8.5",
     "dayjs": "^1.11.13",
+    "express": "^5.1.0",
     "ioredis": "^5.5.0",
     "superjson": "^2.2.2",
     "tinkoff-invest-api": "^7.0.1",
@@ -25,6 +27,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
     "@types/node": "^22.13.1",
     "typescript": "^5.7.3",
     "zx": "^8.3.2"

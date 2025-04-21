@@ -28,5 +28,9 @@ export default defineConfig(() => ({
       // 3. tell vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
     },
+    proxy: {
+      "/auth": "http://localhost:3000",
+      "/trpc": "http://localhost:3000",
+    },
   },
 }));

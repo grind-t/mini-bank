@@ -5,8 +5,8 @@
   import "../app.css";
 
   const bondsUrl = `${base}/`;
-  const settingsUrl = `${base}/settings`;
   const logsUrl = `${base}/logs`;
+  const profileUrl = `${base}/profile`;
 </script>
 
 <ToastHub>
@@ -29,18 +29,18 @@
       <a
         role="tab"
         class="tab"
-        href={settingsUrl}
-        class:tab-active={page.url.pathname === settingsUrl}
-      >
-        Настройки
-      </a>
-      <a
-        role="tab"
-        class="tab"
         href={logsUrl}
         class:tab-active={page.url.pathname === logsUrl}
       >
         Логи
+      </a>
+      <a
+        role="tab"
+        class="tab"
+        href={profileUrl}
+        class:tab-active={page.url.pathname === profileUrl}
+      >
+        Профиль
       </a>
     </div>
   </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getUserContext } from "$lib/auth/context";
   import {
     getTInvestBondRatingText,
     getBondFinderRatingText,
@@ -6,6 +7,8 @@
   import type { Bond, DCAStrategyAsset } from "$lib/common/api";
   import { getDistanceInYearsText } from "$lib/common/date";
   import BondListItem from "./BondListItem.svelte";
+
+  const user = getUserContext();
 
   let {
     bond,
@@ -21,24 +24,26 @@
 </script>
 
 <BondListItem>
-  <div class="flex flex-col">
-    <label>
-      <input
-        checked={!!strategyAsset}
-        type="checkbox"
-        class="checkbox checkbox-xs"
-        onclick={(e) => {
-          e.preventDefault();
+  {#if user}
+    <div class="flex flex-col">
+      <label>
+        <input
+          checked={!!strategyAsset}
+          type="checkbox"
+          class="checkbox checkbox-xs"
+          onclick={(e) => {
+            e.preventDefault();
 
-          if (!strategyAsset) {
-            onAddToStrategy?.({ isin: bond.isin, weight: 1 });
-          } else {
-            onRemoveFromStrategy?.(strategyAsset);
-          }
-        }}
-      />
-    </label>
-  </div>
+            if (!strategyAsset) {
+              onAddToStrategy?.({ isin: bond.isin, weight: 1 });
+            } else {
+              onRemoveFromStrategy?.(strategyAsset);
+            }
+          }}
+        />
+      </label>
+    </div>
+  {/if}
 
   <div class="flex flex-col gap-2">
     <div>{bond.name}</div>

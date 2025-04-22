@@ -15,6 +15,10 @@
   import { toRecord } from "@grind-t/toolkit";
   import BondListRow from "./BondListRow.svelte";
   import BondListHeader from "./BondListHeader.svelte";
+  import DCAButton from "./DCAButton.svelte";
+  import { getUserContext } from "$lib/auth/context";
+
+  const user = getUserContext();
 
   let filter = $state({
     whitelist: [] as string[],
@@ -120,5 +124,9 @@
         />
       {/each}
     </BondList>
+
+    {#if user}
+      <DCAButton />
+    {/if}
   {/if}
 </main>

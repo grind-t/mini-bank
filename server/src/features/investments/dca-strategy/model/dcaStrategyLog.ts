@@ -3,6 +3,7 @@ import type { Asset } from "../../assets/model.ts";
 import type { DCAStrategy } from "./dcaStrategy.ts";
 
 export type DCAStrategyLogPayload = {
+  userId: string;
   strategy: DCAStrategy;
   budget: number;
   initialAssets: InvestAccountAsset[];

@@ -5,12 +5,16 @@ import {
   type BondFinderReportItem,
 } from "../../integrations/bond-finder/report.ts";
 import { getMoexBondsMarketYield } from "../../integrations/moex/getBondsMarketYield.ts";
-import tInvestApi from "../../integrations/t-invest-api/core.ts";
-import { Helpers } from "tinkoff-invest-api";
+import { Helpers, TinkoffInvestApi } from "tinkoff-invest-api";
 import type { Bond } from "../model/bond.ts";
+import { env } from "process";
 
 export async function listAllBonds(): Promise<Bond[]> {
   return withCache("bonds_cache", { minutes: 30 }, async () => {
+    const tInvestApi = new TinkoffInvestApi({
+      token: env.T_INVEST_READONLY_TOKEN as string,
+    });
+
     const [bonds, report, yields] = await Promise.all([
       tInvestApi.instruments.bonds({}).then((v) => v.instruments),
       getBondFinderReport().then((v) => toRecord(v, (v) => v.isin)),

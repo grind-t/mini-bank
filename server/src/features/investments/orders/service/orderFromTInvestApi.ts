@@ -4,16 +4,23 @@ import {
   TimeInForceType,
 } from "tinkoff-invest-api/cjs/generated/orders.js";
 import type { Asset } from "../../assets/model.ts";
-import tInvestApi from "../../integrations/t-invest-api/core.ts";
 import { PriceType } from "tinkoff-invest-api/cjs/generated/common.js";
 import type { OrderedAsset } from "../model.ts";
 import { Helpers } from "tinkoff-invest-api";
+import type { TInvestCtx } from "#features/investments/integrations/t-invest-api/model.ts";
+
+export type OrderFromTInvestApiParams = {
+  accountId: string;
+  asset: Asset;
+  quantity: number;
+};
 
 export async function orderFromTInvestApi(
-  accountId: string,
-  asset: Asset,
-  quantity: number
+  { accountId, asset, quantity }: OrderFromTInvestApiParams,
+  ctx: TInvestCtx
 ): Promise<OrderedAsset> {
+  const { tInvestApi } = ctx;
+
   try {
     const order = await tInvestApi.orders.postOrder({
       quantity,

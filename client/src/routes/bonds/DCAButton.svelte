@@ -29,6 +29,7 @@
         executeDCAStrategyPromise = executeDCAStrategy({
           strategyId: "bonds",
           accountId: tInvestAccountId,
+          accountToken: tInvestAccountToken,
         }).then(() => dialog?.close());
       }}
     >

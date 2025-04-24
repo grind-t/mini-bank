@@ -14,15 +14,19 @@ import { sum, isNullish } from "@grind-t/toolkit";
 import { TRPCError } from "@trpc/server";
 import { orderFromTInvestApi } from "../../orders/service/orderFromTInvestApi.ts";
 import type { OrderedAsset } from "../../orders/model.ts";
+import type { TInvestCtx } from "#features/investments/integrations/t-invest-api/model.ts";
+import type { UserCtx } from "#features/app/auth/model.ts";
 
 export async function executeDCAStrategy(
   strategy: DCAStrategy,
-  accountId: string
+  accountId: string,
+  ctx: UserCtx & TInvestCtx
 ) {
-  const accountPromise = getInvestAccountFromTInvestApi(accountId);
+  const accountPromise = getInvestAccountFromTInvestApi(accountId, ctx);
 
   const assetsPromise = getAssetsFromTInvestApi(
-    strategy.assets.map((v) => v.isin)
+    strategy.assets.map((v) => v.isin),
+    ctx
   );
 
   const budgetPromise = getMoexTradingDays(
@@ -31,11 +35,14 @@ export async function executeDCAStrategy(
   ).then(async (tradingDays) => {
     const budget = strategy.currentMonthBudget / tradingDays;
 
-    await repoTransfer({
-      accountId,
-      direction: OrderDirection.ORDER_DIRECTION_SELL,
-      minSum: budget,
-    });
+    await repoTransfer(
+      {
+        accountId,
+        direction: OrderDirection.ORDER_DIRECTION_SELL,
+        minSum: budget,
+      },
+      ctx
+    );
 
     return budget;
   });
@@ -66,7 +73,16 @@ export async function executeDCAStrategy(
       const diff = rebalancedAsset.quantity - initialAsset.quantity;
 
       if (diff > 0) {
-        acc.push(orderFromTInvestApi(accountId, initialAsset, diff));
+        acc.push(
+          orderFromTInvestApi(
+            {
+              accountId,
+              asset: initialAsset,
+              quantity: diff,
+            },
+            ctx
+          )
+        );
       }
 
       return acc;
@@ -77,15 +93,25 @@ export async function executeDCAStrategy(
   const orderedAssets = await Promise.all(orderPromises);
   const spent = sum(orderedAssets, (v) => v.currentPrice * v.quantity);
 
-  repoTransfer({ accountId, direction: OrderDirection.ORDER_DIRECTION_BUY });
+  repoTransfer(
+    {
+      accountId,
+      direction: OrderDirection.ORDER_DIRECTION_BUY,
+    },
+    ctx
+  );
 
-  setDCAStrategy({
-    id: strategy.id,
-    assets: strategy.assets.filter((_, i) => !isNullish(assets[i])),
-    currentMonthBudget: strategy.currentMonthBudget - spent,
-  });
+  setDCAStrategy(
+    {
+      id: strategy.id,
+      assets: strategy.assets.filter((_, i) => !isNullish(assets[i])),
+      currentMonthBudget: strategy.currentMonthBudget - spent,
+    },
+    ctx
+  );
 
   logDCAStrategy({
+    userId: ctx.user.id,
     strategy,
     initialAssets,
     budget,

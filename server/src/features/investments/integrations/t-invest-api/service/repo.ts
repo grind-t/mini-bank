@@ -1,5 +1,4 @@
-import { Helpers } from "tinkoff-invest-api";
-import tInvestApi from "#features/investments/integrations/t-invest-api/core.ts";
+import { Helpers, TinkoffInvestApi } from "tinkoff-invest-api";
 import {
   OrderDirection,
   OrderIdType,
@@ -13,6 +12,8 @@ import {
   getPositionBalance,
   getTransferQuantity,
 } from "../helpers/transfer.ts";
+import { LastPriceType } from "tinkoff-invest-api/cjs/generated/marketdata.js";
+import type { TInvestCtx } from "../model.ts";
 
 export type RepoTransferParams = {
   accountId: string;
@@ -23,15 +24,17 @@ export type RepoTransferParams = {
 
 export const tmonFundId = "498ec3ff-ef27-4729-9703-a5aac48d5789";
 
-export async function repoTransfer({
-  accountId,
-  direction,
-  minSum,
-  maxSum,
-}: RepoTransferParams) {
-  const pricePromise = tInvestApi.marketData
+export async function repoTransfer(
+  { accountId, direction, minSum, maxSum }: RepoTransferParams,
+  ctx: TInvestCtx
+) {
+  const { tInvestApi } = ctx;
+
+  const pricePromise = tInvestApi.marketdata
     .getLastPrices({
       instrumentId: [tmonFundId],
+      figi: [],
+      lastPriceType: LastPriceType.LAST_PRICE_UNSPECIFIED,
     })
     .then(({ lastPrices }) => {
       if (!lastPrices[0]?.price) {
@@ -65,12 +68,15 @@ export async function repoTransfer({
     priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
   });
 
-  const orderState = await pollOrderState({
-    accountId,
-    orderId: orderResponse.orderId,
-    orderIdType: OrderIdType.ORDER_ID_TYPE_EXCHANGE,
-    priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
-  });
+  const orderState = await pollOrderState(
+    {
+      accountId,
+      orderId: orderResponse.orderId,
+      orderIdType: OrderIdType.ORDER_ID_TYPE_EXCHANGE,
+      priceType: PriceType.PRICE_TYPE_UNSPECIFIED,
+    },
+    ctx
+  );
 
   if (!isOrderFilled(orderState)) {
     throw new Error(

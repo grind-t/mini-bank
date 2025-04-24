@@ -5,16 +5,17 @@ import { setDCAStrategy } from "./service/set.ts";
 import { TRPCError } from "@trpc/server";
 import { executeDCAStrategy } from "./service/exec.ts";
 import { getDCAStrategyLogs } from "./service/getLogs.ts";
+import { TinkoffInvestApi } from "tinkoff-invest-api";
 
 export const dcaStrategies = {
-  get: publicProcedure
+  get: protectedProcedure
     .input(
       z.object({
         id: z.string(),
       })
     )
-    .query(async ({ input }) => {
-      return await getDCAStrategy(input.id);
+    .query(async ({ input, ctx }) => {
+      return await getDCAStrategy(input.id, ctx.session);
     }),
   set: protectedProcedure
     .input(
@@ -24,13 +25,19 @@ export const dcaStrategies = {
         assets: z.array(z.object({ isin: z.string(), weight: z.number() })),
       })
     )
-    .mutation(async ({ input }) => {
-      return await setDCAStrategy(input);
+    .mutation(async ({ input, ctx }) => {
+      return await setDCAStrategy(input, ctx.session);
     }),
   execute: protectedProcedure
-    .input(z.object({ strategyId: z.string(), accountId: z.string() }))
-    .mutation(async ({ input }) => {
-      const strategy = await getDCAStrategy(input.strategyId);
+    .input(
+      z.object({
+        strategyId: z.string(),
+        accountId: z.string(),
+        accountToken: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const strategy = await getDCAStrategy(input.strategyId, ctx.session);
 
       if (!strategy) {
         throw new TRPCError({
@@ -39,11 +46,19 @@ export const dcaStrategies = {
         });
       }
 
-      await executeDCAStrategy(strategy, input.accountId);
+      await executeDCAStrategy(strategy, input.accountId, {
+        user: ctx.session.user,
+        tInvestApi: new TinkoffInvestApi({ token: input.accountToken }),
+      });
     }),
-  logs: publicProcedure
+  logs: protectedProcedure
     .input(z.object({ id: z.string(), from: z.date(), to: z.date() }))
-    .query(async ({ input }) => {
-      return await getDCAStrategyLogs(input.id, input.from, input.to);
+    .query(async ({ input, ctx }) => {
+      return await getDCAStrategyLogs(
+        input.id,
+        input.from,
+        input.to,
+        ctx.session
+      );
     }),
 };

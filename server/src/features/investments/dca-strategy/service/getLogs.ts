@@ -1,4 +1,5 @@
 import { redis } from "#app/database/redis.ts";
+import type { UserCtx } from "#features/app/auth/model.ts";
 import {
   dcaStrategiesLogsKey,
   type DCAStrategyLog,
@@ -7,10 +8,13 @@ import {
 export async function getDCAStrategyLogs(
   id: string,
   from: Date,
-  to: Date
+  to: Date,
+  ctx: UserCtx
 ): Promise<DCAStrategyLog[]> {
+  const { user } = ctx;
+
   const logs = await redis.zrangebyscore(
-    `${dcaStrategiesLogsKey}:${id}`,
+    `${dcaStrategiesLogsKey}:${user.id}:${id}`,
     from.getTime(),
     to.getTime()
   );

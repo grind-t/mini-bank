@@ -1,11 +1,14 @@
 import type { Asset } from "../model.ts";
-import tInvestApi from "#features/investments/integrations/t-invest-api/core.ts";
 import { getAssetPriceFromTInvestApi } from "./getPriceFromTInvestApi.ts";
 import { isNullish } from "@grind-t/toolkit";
+import type { TInvestCtx } from "#features/investments/integrations/t-invest-api/model.ts";
 
 export async function getAssetFromTInvestApi(
-  id: string
+  id: string,
+  ctx: TInvestCtx
 ): Promise<Asset | null> {
+  const { tInvestApi } = ctx;
+
   const instrument = await tInvestApi.instruments
     .findInstrument({
       query: id,
@@ -17,7 +20,7 @@ export async function getAssetFromTInvestApi(
     return null;
   }
 
-  const currentPrice = await getAssetPriceFromTInvestApi(instrument);
+  const currentPrice = await getAssetPriceFromTInvestApi(instrument, ctx);
 
   if (isNullish(currentPrice)) {
     return null;
@@ -31,6 +34,6 @@ export async function getAssetFromTInvestApi(
   };
 }
 
-export function getAssetsFromTInvestApi(ids: string[]) {
-  return Promise.all(ids.map((id) => getAssetFromTInvestApi(id)));
+export function getAssetsFromTInvestApi(ids: string[], ctx: TInvestCtx) {
+  return Promise.all(ids.map((id) => getAssetFromTInvestApi(id, ctx)));
 }

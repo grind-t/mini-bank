@@ -7,7 +7,7 @@ import {
 export async function logDCAStrategy(payload: DCAStrategyLogPayload) {
   const timestamp = Date.now();
   await redis.zadd(
-    `${dcaStrategiesLogsKey}:${payload.strategy.id}`,
+    `${dcaStrategiesLogsKey}:${payload.userId}:${payload.strategy.id}`,
     timestamp,
     JSON.stringify({ ...payload, timestamp })
   );

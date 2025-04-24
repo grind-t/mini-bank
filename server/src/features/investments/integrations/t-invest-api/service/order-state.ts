@@ -3,9 +3,14 @@ import {
   OrderState,
   type GetOrderStateRequest,
 } from "tinkoff-invest-api/cjs/generated/orders.js";
-import tInvestApi from "../core.ts";
+import type { TInvestCtx } from "../model.ts";
 
-export async function pollOrderState(req: GetOrderStateRequest) {
+export async function pollOrderState(
+  req: GetOrderStateRequest,
+  ctx: TInvestCtx
+) {
+  const { tInvestApi } = ctx;
+
   let response = await tInvestApi.orders.getOrderState(req);
 
   while (

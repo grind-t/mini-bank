@@ -2,19 +2,24 @@ import {
   type InstrumentShort,
   InstrumentIdType,
 } from "tinkoff-invest-api/cjs/generated/instruments.js";
-import tInvestApi from "../../integrations/t-invest-api/core.ts";
 import { InstrumentType } from "tinkoff-invest-api/cjs/generated/common.js";
 import { getBondPrice } from "../../integrations/t-invest-api/helpers/bond-price.ts";
-import dayjs from "dayjs";
 import { isNullish } from "@grind-t/toolkit";
 import { Helpers } from "tinkoff-invest-api";
+import { LastPriceType } from "tinkoff-invest-api/cjs/generated/marketdata.js";
+import type { TInvestCtx } from "#features/investments/integrations/t-invest-api/model.ts";
 
 export async function getAssetPriceFromTInvestApi(
-  instrument: InstrumentShort
+  instrument: InstrumentShort,
+  ctx: TInvestCtx
 ): Promise<number | null> {
-  const marketPricePromise = tInvestApi.marketData
+  const { tInvestApi } = ctx;
+
+  const marketPricePromise = tInvestApi.marketdata
     .getLastPrices({
       instrumentId: [instrument.uid],
+      figi: [],
+      lastPriceType: LastPriceType.LAST_PRICE_UNSPECIFIED,
     })
     .then(({ lastPrices }) => lastPrices[0]?.price);
 

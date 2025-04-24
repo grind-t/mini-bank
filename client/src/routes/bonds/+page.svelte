@@ -80,8 +80,10 @@
   );
 
   onMount(async () => {
-    strategy = (await getDCAStrategy({ id: "bonds" })) ?? strategy;
-    filter.whitelist = strategy.assets.map((v) => v.isin);
+    if (user) {
+      strategy = (await getDCAStrategy({ id: "bonds" })) ?? strategy;
+      filter.whitelist = strategy.assets.map((v) => v.isin);
+    }
     bonds = await getBonds({ filter });
   });
 
@@ -99,13 +101,15 @@
 
 <main class="flex flex-col flex-1">
   {#if bonds.length}
-    <CurrentMonthBudget
-      value={strategy.currentMonthBudget}
-      onChange={(value) => {
-        strategy.currentMonthBudget = value;
-        setDCAStrategy(strategy);
-      }}
-    />
+    {#if user}
+      <CurrentMonthBudget
+        value={strategy.currentMonthBudget}
+        onChange={(value) => {
+          strategy.currentMonthBudget = value;
+          setDCAStrategy(strategy);
+        }}
+      />
+    {/if}
     <BondList>
       <BondListHeader {selectedBonds} />
       {#each selectedBonds as bond (bond.isin)}

@@ -1,9 +1,11 @@
 import { Redis } from "ioredis";
+import ms from "ms";
+import { env } from "process";
 
 export const redis = new Redis({
-  host: process.env.REDIS_HOST as string,
-  port: Number.parseInt(process.env.REDIS_PORT as string),
-  password: process.env.REDIS_PASSWORD as string,
+  host: env.REDIS_HOST as string,
+  port: Number.parseInt(env.REDIS_PORT as string),
+  password: env.REDIS_PASSWORD as string,
   tls: {
     ca: await fetch("https://storage.yandexcloud.net/cloud-certs/CA.pem").then(
       (response) => response.text()
@@ -13,17 +15,7 @@ export const redis = new Redis({
 
 export async function withCache<T>(
   key: string,
-  {
-    days = 0,
-    hours = 0,
-    minutes = 0,
-    seconds = 0,
-  }: {
-    days?: number;
-    hours?: number;
-    minutes?: number;
-    seconds?: number;
-  },
+  duration: ms.StringValue,
   fn: () => Promise<T>
 ) {
   const cachedResponse = await redis.get(key);
@@ -34,11 +26,6 @@ export async function withCache<T>(
 
   const response = await fn();
 
-  redis.set(
-    key,
-    JSON.stringify(response),
-    "EX",
-    days * 24 * 60 * 60 + hours * 60 * 60 + minutes * 60 + seconds
-  );
+  redis.set(key, JSON.stringify(response), "EX", ms(duration) / 1000);
   return response;
 }

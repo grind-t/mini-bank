@@ -23,12 +23,10 @@ export async function executeDCAStrategy(
   ctx: UserCtx & TInvestCtx
 ) {
   const accountPromise = getInvestAccountFromTInvestApi(accountId, ctx);
-
   const assetsPromise = getAssetsFromTInvestApi(
     strategy.assets.map((v) => v.isin),
     ctx
   );
-
   const budgetPromise = getMoexTradingDays(
     dayjs(),
     dayjs().endOf("month")
@@ -59,7 +57,6 @@ export async function executeDCAStrategy(
   );
 
   const targetRatios = getDCAStrategyAssetsRatios(strategy.assets);
-
   const rebalancedAssets = rebalanceInvestAccount(
     initialAssets,
     targetRatios,

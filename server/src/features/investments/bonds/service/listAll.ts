@@ -10,7 +10,7 @@ import type { Bond } from "../model/bond.ts";
 import { env } from "process";
 
 export async function listAllBonds(): Promise<Bond[]> {
-  return withCache("bonds_cache", { minutes: 30 }, async () => {
+  return withCache("bonds_cache", "30m", async () => {
     const tInvestApi = new TinkoffInvestApi({
       token: env.T_INVEST_READONLY_TOKEN as string,
     });

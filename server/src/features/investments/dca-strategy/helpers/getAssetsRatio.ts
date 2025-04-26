@@ -1,4 +1,4 @@
-import { sum } from "@grind-t/toolkit";
+import { sum } from "@grind-t/toolkit/array";
 import type { DCAStrategyAsset } from "../model/dcaStrategy.ts";
 
 export function getDCAStrategyAssetsRatios(

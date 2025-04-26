@@ -1,6 +1,6 @@
 <script lang="ts">
   import AuthLoader from "$lib/auth/AuthLoader.svelte";
-  import ToastHub from "$lib/common/components/ToastHub.svelte";
+  import ToastHub from "$lib/ui/ToastHub.svelte";
   import Tabs from "./Tabs.svelte";
   import type { Snippet } from "svelte";
   import "../app.css";

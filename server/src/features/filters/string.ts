@@ -1,6 +1,6 @@
 import type z from "zod";
 import type { StringFilterSchema } from "./string.schema.ts";
-import { isNullish } from "@grind-t/toolkit";
+import { isNullish } from "@grind-t/toolkit/nullish";
 
 export type StringFilter = z.infer<typeof StringFilterSchema>;
 

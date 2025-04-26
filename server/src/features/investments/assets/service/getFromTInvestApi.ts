@@ -1,6 +1,6 @@
 import type { Asset } from "../model.ts";
 import { getAssetPriceFromTInvestApi } from "./getPriceFromTInvestApi.ts";
-import { isNullish } from "@grind-t/toolkit";
+import { isNullish } from "@grind-t/toolkit/nullish";
 import type { TInvestCtx } from "#features/investments/integrations/t-invest-api/model.ts";
 
 export async function getAssetFromTInvestApi(

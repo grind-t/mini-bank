@@ -2,8 +2,8 @@
   import type { Snippet } from "svelte";
   import { getSession } from "./api";
   import AuthProvider from "./AuthProvider.svelte";
-  import GenericLoader from "$lib/generic/GenericLoader.svelte";
-  import GenericError from "$lib/generic/GenericError.svelte";
+  import GenericLoader from "$lib/ui/GenericLoader.svelte";
+  import GenericError from "$lib/ui/GenericError.svelte";
 
   const { children }: { children: Snippet } = $props();
 </script>

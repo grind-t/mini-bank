@@ -1,4 +1,4 @@
-import { toRecord } from "@grind-t/toolkit";
+import { toRecord } from "@grind-t/toolkit/array";
 import type {
   InvestAccountAsset,
   InvestAccountAssetShort,

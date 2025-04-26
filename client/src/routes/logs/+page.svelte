@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { getDCAStrategyLogs } from "$lib/common/api";
   import dayjs from "dayjs";
-  import Log from "./Log.svelte";
+  import Log from "./components/Log.svelte";
+  import { trpc } from "$lib/trpc";
 
   function getLogs() {
-    return getDCAStrategyLogs({
+    return trpc.dcaStrategies.logs.query({
       id: "bonds",
       from: dayjs().subtract(1, "week").toDate(),
       to: dayjs().toDate(),

@@ -1,13 +1,12 @@
 <script lang="ts">
-  import { executeDCAStrategy } from "$lib/common/api";
-  import Toast from "$lib/common/components/Toast.svelte";
+  import { trpc } from "$lib/trpc";
+  import Toast from "$lib/ui/Toast.svelte";
 
   let dialog = $state<HTMLDialogElement | null>(null);
   let tInvestAccountId = $state("");
   let tInvestAccountToken = $state("");
 
-  let executeDCAStrategyPromise =
-    $state<ReturnType<typeof executeDCAStrategy>>();
+  let executeDCAStrategyPromise = $state<Promise<void>>();
 </script>
 
 <button
@@ -26,11 +25,13 @@
     <form
       onsubmit={(e) => {
         e.preventDefault();
-        executeDCAStrategyPromise = executeDCAStrategy({
-          strategyId: "bonds",
-          accountId: tInvestAccountId,
-          accountToken: tInvestAccountToken,
-        }).then(() => dialog?.close());
+        executeDCAStrategyPromise = trpc.dcaStrategies.execute
+          .mutate({
+            strategyId: "bonds",
+            accountId: tInvestAccountId,
+            accountToken: tInvestAccountToken,
+          })
+          .then(() => dialog?.close());
       }}
     >
       <h2>Стратегия DCA</h2>

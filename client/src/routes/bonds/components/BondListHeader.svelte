@@ -1,11 +1,15 @@
 <script lang="ts">
   import { getUserContext } from "$lib/auth/context";
-  import type { Bond } from "$lib/common/api";
+  import type { RouterOutput } from "$lib/trpc";
   import BondListItem from "./BondListItem.svelte";
 
   const user = getUserContext();
 
-  let { selectedBonds }: { selectedBonds: Bond[] } = $props();
+  let {
+    selectedBonds,
+  }: {
+    selectedBonds: RouterOutput["bonds"]["list"];
+  } = $props();
 </script>
 
 <BondListItem sticky>

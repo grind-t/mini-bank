@@ -4,7 +4,7 @@ import {
 } from "tinkoff-invest-api/cjs/generated/instruments.js";
 import { InstrumentType } from "tinkoff-invest-api/cjs/generated/common.js";
 import { getBondPrice } from "../../integrations/t-invest-api/helpers/bond-price.ts";
-import { isNullish } from "@grind-t/toolkit";
+import { isNullish } from "@grind-t/toolkit/nullish";
 import { Helpers } from "tinkoff-invest-api";
 import { LastPriceType } from "tinkoff-invest-api/cjs/generated/marketdata.js";
 import type { TInvestCtx } from "#features/investments/integrations/t-invest-api/model.ts";

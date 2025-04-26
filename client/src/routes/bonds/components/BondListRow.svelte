@@ -1,12 +1,15 @@
 <script lang="ts">
   import { getUserContext } from "$lib/auth/context";
-  import {
-    getTInvestBondRatingText,
-    getBondFinderRatingText,
-  } from "$lib/bonds/rating";
-  import type { Bond, DCAStrategyAsset } from "$lib/common/api";
-  import { getDistanceInYearsText } from "$lib/common/date";
+  import { getTInvestBondRatingText } from "../helpers/getTInvestBondRatingText";
+  import { getBondFinderRatingText } from "../helpers/getBondFinderRatingText";
+  import type { RouterOutput } from "$lib/trpc";
+  import { getYearsLabel } from "@grind-t/toolkit/date";
   import BondListItem from "./BondListItem.svelte";
+  import dayjs from "dayjs";
+
+  type Bond = RouterOutput["bonds"]["list"][number];
+  type DCAStrategy = NonNullable<RouterOutput["dcaStrategies"]["get"]>;
+  type DCAStrategyAsset = DCAStrategy["assets"][number];
 
   const user = getUserContext();
 
@@ -21,6 +24,11 @@
     onAddToStrategy?: (asset: DCAStrategyAsset) => void;
     onRemoveFromStrategy?: (asset: DCAStrategyAsset) => void;
   } = $props();
+
+  function getDistanceInYearsText(date: Date) {
+    const years = +dayjs(date).diff(dayjs(), "years", true).toFixed(1);
+    return `${years} ${(getYearsLabel(years), "ru")}`;
+  }
 </script>
 
 <BondListItem>

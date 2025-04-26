@@ -1,8 +1,12 @@
 <script lang="ts">
-  import type { DCAStrategyLog } from "$lib/common/api";
+  import type { RouterOutput } from "$lib/trpc";
   import dayjs from "dayjs";
 
-  let { log }: { log: DCAStrategyLog } = $props();
+  let {
+    log,
+  }: {
+    log: RouterOutput["dcaStrategies"]["logs"][number];
+  } = $props();
 </script>
 
 <div class="divider">{dayjs(log.timestamp).format("DD.MM.YYYY HH:mm")}</div>

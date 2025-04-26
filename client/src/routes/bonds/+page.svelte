@@ -1,22 +1,19 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import {
-    getBonds,
-    getDCAStrategy,
-    setDCAStrategy,
-    type Bond,
-    type BondListFilter,
-    type DCAStrategy,
-    type DCAStrategyAsset,
-  } from "$lib/common/api";
-  import BondList from "./BondList.svelte";
-  import CurrentMonthBudget from "./CurrentMonthBudget.svelte";
+  import { trpc, type RouterInput, type RouterOutput } from "$lib/trpc";
+  import BondList from "./components/BondList.svelte";
+  import CurrentMonthBudget from "./components/CurrentMonthBudget.svelte";
   import dayjs from "dayjs";
-  import { toRecord } from "@grind-t/toolkit";
-  import BondListRow from "./BondListRow.svelte";
-  import BondListHeader from "./BondListHeader.svelte";
-  import DCAButton from "./DCAButton.svelte";
+  import { toRecord } from "@grind-t/toolkit/array";
+  import BondListRow from "./components/BondListRow.svelte";
+  import BondListHeader from "./components/BondListHeader.svelte";
+  import DCAButton from "./components/DCAButton.svelte";
   import { getUserContext } from "$lib/auth/context";
+
+  type Bond = RouterOutput["bonds"]["list"][number];
+  type BondListFilter = RouterInput["bonds"]["list"]["filter"];
+  type DCAStrategy = NonNullable<RouterOutput["dcaStrategies"]["get"]>;
+  type DCAStrategyAsset = DCAStrategy["assets"][number];
 
   const user = getUserContext();
 
@@ -81,21 +78,22 @@
 
   onMount(async () => {
     if (user) {
-      strategy = (await getDCAStrategy({ id: "bonds" })) ?? strategy;
+      strategy =
+        (await trpc.dcaStrategies.get.query({ id: "bonds" })) ?? strategy;
       filter.whitelist = strategy.assets.map((v) => v.isin);
     }
-    bonds = await getBonds({ filter });
+    bonds = await trpc.bonds.list.query({ filter });
   });
 
   function onAddBondToStrategy(asset: DCAStrategyAsset) {
     strategy.assets.push(asset);
-    setDCAStrategy(strategy);
+    trpc.dcaStrategies.set.mutate(strategy);
   }
 
   function onRemoveBondFromStrategy(asset: DCAStrategyAsset) {
     const idx = strategy.assets.findIndex((v) => v === asset);
     strategy.assets.splice(idx, 1);
-    setDCAStrategy(strategy);
+    trpc.dcaStrategies.set.mutate(strategy);
   }
 </script>
 
@@ -106,7 +104,7 @@
         value={strategy.currentMonthBudget}
         onChange={(value) => {
           strategy.currentMonthBudget = value;
-          setDCAStrategy(strategy);
+          trpc.dcaStrategies.set.mutate(strategy);
         }}
       />
     {/if}

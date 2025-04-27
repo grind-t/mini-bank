@@ -1,6 +1,6 @@
 <script lang="ts">
   import dayjs from "dayjs";
-  import Log from "./components/Log.svelte";
+  import Log from "./Log.svelte";
   import { trpc } from "$lib/trpc";
 
   function getLogs() {

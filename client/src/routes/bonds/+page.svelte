@@ -15,42 +15,14 @@
   import BondListHeader from "$lib/bonds/list/BondListHeader.svelte";
   import DCAButton from "$lib/bonds/dca/DCAButton.svelte";
   import { getUserContext } from "$lib/auth/context";
+  import {
+    getBondListFilter,
+    setBondListFilter,
+  } from "$lib/bonds/filters/storage";
 
   const user = getUserContext();
 
-  let filter = $state<BondListFilter>({
-    whitelist: [] as string[],
-    yield: {
-      gte: 22 as number | undefined,
-      lte: 32 as number | undefined,
-    },
-    rating: {
-      tInvest: {
-        gte: 1 as number | undefined,
-      },
-      bondFinder: {
-        gte: 4 as number | undefined,
-      },
-    },
-    nominal: {
-      lte: 10000,
-    },
-    maturityDate: {
-      lte: dayjs().add(2, "years").toDate() as Date | undefined,
-      gte: dayjs().add(1, "month").toDate() as Date | undefined,
-      unit: "day",
-    },
-    currency: {
-      in: ["rub"],
-    },
-    sector: {
-      nin: ["real_estate"],
-    },
-    hasAmortization: { eq: false },
-    hasOffer: { eq: false },
-    forQual: { eq: false },
-  });
-
+  let filter = $state<BondListFilter>(getBondListFilter());
   let bonds = $state<Bond[]>([]);
   let strategy = $state<DCAStrategy>({
     id: "bonds",
@@ -63,11 +35,11 @@
   let [selectedBonds, restBonds] = $derived(
     bonds.reduce(
       (acc: Bond[][], bond) => {
-        const { isin, rating } = bond;
+        const { isin } = bond;
 
         if (assetsMap[isin]) {
           acc[0].push(bond);
-        } else if (rating.tInvest !== 1 || rating.bondFinder) {
+        } else {
           acc[1].push(bond);
         }
 
@@ -79,11 +51,13 @@
 
   onMount(async () => {
     if (user) {
-      strategy =
-        (await trpc.dcaStrategies.get.query({ id: "bonds" })) ?? strategy;
-      filter ??= {};
+      strategy = await trpc.dcaStrategies.get
+        .query({ id: "bonds" })
+        .then((v) => v ?? strategy);
+
       filter.whitelist = strategy.assets.map((v) => v.isin);
     }
+
     bonds = await trpc.bonds.list.query({ filter });
   });
 
@@ -117,6 +91,7 @@
         onFilterChange={async (value) => {
           filter = value;
           bonds = await trpc.bonds.list.query({ filter });
+          setBondListFilter(value);
         }}
       />
       {#each selectedBonds as bond (bond.isin)}

@@ -1,7 +1,3 @@
-<script lang="ts">
-  let props = $props();
-</script>
-
 <div
   class="flex flex-col h-full items-center justify-center"
   role="status"

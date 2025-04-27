@@ -27,7 +27,7 @@
 
   function getDistanceInYearsText(date: Date) {
     const years = +dayjs(date).diff(dayjs(), "years", true).toFixed(1);
-    return `${years} ${(getYearsLabel(years), "ru")}`;
+    return `${years} ${getYearsLabel(years, "ru")}`;
   }
 </script>
 

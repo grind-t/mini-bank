@@ -1,6 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { trpc, type RouterInput, type RouterOutput } from "$lib/trpc";
+  import { trpc } from "$lib/trpc";
+  import type {
+    Bond,
+    BondListFilter,
+    DCAStrategy,
+    DCAStrategyAsset,
+  } from "$lib/trpc";
   import BondList from "./components/BondList.svelte";
   import CurrentMonthBudget from "./components/CurrentMonthBudget.svelte";
   import dayjs from "dayjs";
@@ -10,14 +16,9 @@
   import DCAButton from "./components/DCAButton.svelte";
   import { getUserContext } from "$lib/auth/context";
 
-  type Bond = RouterOutput["bonds"]["list"][number];
-  type BondListFilter = RouterInput["bonds"]["list"]["filter"];
-  type DCAStrategy = NonNullable<RouterOutput["dcaStrategies"]["get"]>;
-  type DCAStrategyAsset = DCAStrategy["assets"][number];
-
   const user = getUserContext();
 
-  let filter = $state({
+  let filter = $state<BondListFilter>({
     whitelist: [] as string[],
     yield: {
       gte: 22 as number | undefined,
@@ -48,7 +49,7 @@
     hasAmortization: { eq: false },
     hasOffer: { eq: false },
     forQual: { eq: false },
-  } satisfies BondListFilter);
+  });
 
   let bonds = $state<Bond[]>([]);
   let strategy = $state<DCAStrategy>({
@@ -80,6 +81,7 @@
     if (user) {
       strategy =
         (await trpc.dcaStrategies.get.query({ id: "bonds" })) ?? strategy;
+      filter ??= {};
       filter.whitelist = strategy.assets.map((v) => v.isin);
     }
     bonds = await trpc.bonds.list.query({ filter });
@@ -109,7 +111,14 @@
       />
     {/if}
     <BondList>
-      <BondListHeader {selectedBonds} />
+      <BondListHeader
+        {selectedBonds}
+        {filter}
+        onFilterChange={async (value) => {
+          filter = value;
+          bonds = await trpc.bonds.list.query({ filter });
+        }}
+      />
       {#each selectedBonds as bond (bond.isin)}
         <BondListRow
           {bond}

@@ -17,3 +17,16 @@ const trpc = createTRPCClient<AppRouter>({
 
 export { trpc };
 export type { RouterInput, RouterOutput };
+
+export type Bond = RouterOutput["bonds"]["list"][number];
+export type BondListFilter = NonNullable<
+  RouterInput["bonds"]["list"]["filter"]
+>;
+
+export type DCAStrategy = NonNullable<RouterOutput["dcaStrategies"]["get"]>;
+export type DCAStrategyAsset = DCAStrategy["assets"][number];
+
+export type StringFilter = NonNullable<BondListFilter["sector"]>;
+export type NumberFilter = NonNullable<BondListFilter["yield"]>;
+export type DateFilter = NonNullable<BondListFilter["maturityDate"]>;
+export type BooleanFilter = NonNullable<BondListFilter["forQual"]>;

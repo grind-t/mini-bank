@@ -38,7 +38,7 @@ export async function listAllBonds(): Promise<Bond[]> {
           yield: bondYield,
           rating: {
             tInvest: bond.riskLevel < 1 ? undefined : 3 - bond.riskLevel,
-            bondFinder: reportItem?.rating,
+            bondFinder: reportItem?.rating || undefined,
           },
           nominal: Helpers.toNumber(bond.nominal),
           currency: bond.currency,

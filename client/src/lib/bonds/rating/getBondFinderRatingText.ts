@@ -32,8 +32,6 @@ export function getBondFinderRatingText(rating: number) {
       return "B";
     case 0.9:
       return "B-";
-    case 0:
-      return "N/A";
     default:
       return "U";
   }

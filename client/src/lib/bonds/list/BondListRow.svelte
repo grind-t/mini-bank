@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getUserContext } from "$lib/auth/context";
-  import { getTInvestBondRatingText } from "../helpers/getTInvestBondRatingText";
-  import { getBondFinderRatingText } from "../helpers/getBondFinderRatingText";
+  import { getTInvestBondRatingText } from "../rating/getTInvestBondRatingText";
+  import { getBondFinderRatingText } from "../rating/getBondFinderRatingText";
   import type { RouterOutput } from "$lib/trpc";
   import { getYearsLabel } from "@grind-t/toolkit/date";
   import BondListItem from "./BondListItem.svelte";

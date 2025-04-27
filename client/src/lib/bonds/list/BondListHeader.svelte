@@ -3,12 +3,12 @@
   import type { Bond, BondListFilter } from "$lib/trpc";
   import BondListItem from "./BondListItem.svelte";
   import FilterButton from "../../../lib/ui/filters/FilterButton.svelte";
-  import FilterCompaniesForm from "./FilterCompaniesForm.svelte";
-  import FilterRisksForm from "./FilterRisksForm.svelte";
   import type { Promisable } from "type-fest";
   import Modal from "$lib/ui/Modal.svelte";
-  import FilterYieldForm from "./FilterYieldForm.svelte";
-  import FilterMaturityDateForm from "./FilterMaturityDateForm.svelte";
+  import FilterCompaniesForm from "../filters/FilterCompaniesForm.svelte";
+  import FilterRisksForm from "../filters/FilterRisksForm.svelte";
+  import FilterYieldForm from "../filters/FilterYieldForm.svelte";
+  import FilterMaturityDateForm from "../filters/FilterMaturityDateForm.svelte";
 
   const user = getUserContext();
 

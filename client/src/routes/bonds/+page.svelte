@@ -7,13 +7,13 @@
     DCAStrategy,
     DCAStrategyAsset,
   } from "$lib/trpc";
-  import BondList from "./components/BondList.svelte";
-  import CurrentMonthBudget from "./components/CurrentMonthBudget.svelte";
+  import BondList from "$lib/bonds/list/BondList.svelte";
+  import CurrentMonthBudget from "$lib/bonds/dca/CurrentMonthBudget.svelte";
   import dayjs from "dayjs";
   import { toRecord } from "@grind-t/toolkit/array";
-  import BondListRow from "./components/BondListRow.svelte";
-  import BondListHeader from "./components/BondListHeader.svelte";
-  import DCAButton from "./components/DCAButton.svelte";
+  import BondListRow from "$lib/bonds/list/BondListRow.svelte";
+  import BondListHeader from "$lib/bonds/list/BondListHeader.svelte";
+  import DCAButton from "$lib/bonds/dca/DCAButton.svelte";
   import { getUserContext } from "$lib/auth/context";
 
   const user = getUserContext();

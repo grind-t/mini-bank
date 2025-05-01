@@ -2,20 +2,16 @@
   "name": "mini-bank-client",
   "version": "0.1.0",
   "description": "",
-  "homepage": "https://grind-t.github.io/mini-bank",
   "type": "module",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "postbuild": "ncp ./build ../server/src/features/app/client/build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "tauri": "tauri",
     "format": "prettier . --write",
-    "lint": "eslint .",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "lint": "eslint ."
   },
   "license": "MIT",
   "dependencies": {

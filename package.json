@@ -9,7 +9,10 @@
   "scripts": {
     "check": "concurrently \"npm run check --workspace=client\" \"npm run check --workspace=server\"",
     "dev": "concurrently \"npm run dev --workspace=client\" \"npm run dev --workspace=server\"",
-    "deploy": "concurrently \"npm run deploy --workspace=client\" \"npm run deploy --workspace=server\""
+    "build": "npm run build --workspace=client",
+    "postbuild": "ncp ./client/build ./server/src/features/app/client/build",
+    "predeploy": "npm run build",
+    "deploy": "npm run deploy --workspace=server"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

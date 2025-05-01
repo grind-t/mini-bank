@@ -2,25 +2,23 @@
   import { getUserContext } from "$lib/auth/context";
   import { getTInvestBondRatingText } from "../rating/getTInvestBondRatingText";
   import { getBondFinderRatingText } from "../rating/getBondFinderRatingText";
-  import type { RouterOutput } from "$lib/trpc";
+  import type { Bond, DCAStrategyAsset } from "$lib/trpc";
   import { getYearsLabel } from "@grind-t/toolkit/date";
   import BondListItem from "./BondListItem.svelte";
   import dayjs from "dayjs";
-
-  type Bond = RouterOutput["bonds"]["list"][number];
-  type DCAStrategy = NonNullable<RouterOutput["dcaStrategies"]["get"]>;
-  type DCAStrategyAsset = DCAStrategy["assets"][number];
 
   const user = getUserContext();
 
   let {
     bond,
     strategyAsset,
+    offsetHeight = $bindable(),
     onAddToStrategy,
     onRemoveFromStrategy,
   }: {
     bond: Bond;
     strategyAsset?: DCAStrategyAsset;
+    offsetHeight?: number;
     onAddToStrategy?: (asset: DCAStrategyAsset) => void;
     onRemoveFromStrategy?: (asset: DCAStrategyAsset) => void;
   } = $props();
@@ -31,7 +29,7 @@
   }
 </script>
 
-<BondListItem>
+<BondListItem bind:offsetHeight>
   {#if user}
     <div class="flex flex-col">
       <label>

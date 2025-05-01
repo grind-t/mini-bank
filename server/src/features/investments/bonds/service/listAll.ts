@@ -8,6 +8,7 @@ import { getMoexBondsMarketYield } from "../../integrations/moex/getBondsMarketY
 import { Helpers, TinkoffInvestApi } from "tinkoff-invest-api";
 import type { Bond } from "../model/bond.ts";
 import { env } from "process";
+import { getMoexBondSecurities } from "#features/investments/integrations/moex/getBondSecurities.ts";
 
 export async function listAllBonds(): Promise<Bond[]> {
   return withCache("bonds_cache", "30m", async () => {
@@ -15,8 +16,9 @@ export async function listAllBonds(): Promise<Bond[]> {
       token: env.T_INVEST_READONLY_TOKEN as string,
     });
 
-    const [bonds, report, yields] = await Promise.all([
+    const [bonds, moexBonds, report, yields] = await Promise.all([
       tInvestApi.instruments.bonds({}).then((v) => v.instruments),
+      getMoexBondSecurities().then((v) => toRecord(v, (v) => v.isin)),
       getBondFinderReport().then((v) => toRecord(v, (v) => v.isin)),
       getMoexBondsMarketYield().then((v) => toRecord(v, (v) => v.SECID)),
     ]);
@@ -24,6 +26,7 @@ export async function listAllBonds(): Promise<Bond[]> {
     return bonds
       .reduce((acc: Bond[], bond) => {
         const isin = bond.isin;
+        const moexBond = moexBonds[isin];
         const reportItem = report[isin] as BondFinderReportItem | undefined;
         const effectiveYield = yields[isin]?.EFFECTIVEYIELD || 0;
         const roundedEffectiveYield = Math.round(effectiveYield * 100) / 100;
@@ -43,6 +46,7 @@ export async function listAllBonds(): Promise<Bond[]> {
           nominal: Helpers.toNumber(bond.nominal),
           currency: bond.currency,
           sector: bond.sector,
+          emitentId: moexBond.emitent_id.toString(),
           isFloater: bond.floatingCouponFlag,
           hasAmortization: bond.amortizationFlag,
           hasOffer: !!bond.callDate || !!reportItem?.has_offer,

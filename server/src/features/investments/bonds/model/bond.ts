@@ -10,6 +10,7 @@ export type Bond = {
   nominal?: number;
   currency: string;
   sector: string;
+  emitentId: string;
   isFloater: boolean;
   hasAmortization: boolean;
   hasOffer: boolean;

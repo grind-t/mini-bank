@@ -9,8 +9,6 @@
   } from "$lib/trpc";
   import BondList from "$lib/bonds/list/BondList.svelte";
   import CurrentMonthBudget from "$lib/bonds/dca/CurrentMonthBudget.svelte";
-  import dayjs from "dayjs";
-  import { toRecord } from "@grind-t/toolkit/array";
   import BondListRow from "$lib/bonds/list/BondListRow.svelte";
   import BondListHeader from "$lib/bonds/list/BondListHeader.svelte";
   import DCAButton from "$lib/bonds/dca/DCAButton.svelte";
@@ -19,6 +17,8 @@
     getBondListFilter,
     setBondListFilter,
   } from "$lib/bonds/filters/storage";
+  import { getBondListGroups } from "$lib/bonds/list/getBondListGroups";
+  import BondListRowGroup from "$lib/bonds/list/BondListRowGroup.svelte";
 
   const user = getUserContext();
 
@@ -30,23 +30,8 @@
     assets: [],
   });
 
-  let assetsMap = $derived(toRecord(strategy.assets, (v) => v.isin));
-
-  let [selectedBonds, restBonds] = $derived(
-    bonds.reduce(
-      (acc: Bond[][], bond) => {
-        const { isin } = bond;
-
-        if (assetsMap[isin]) {
-          acc[0].push(bond);
-        } else {
-          acc[1].push(bond);
-        }
-
-        return acc;
-      },
-      [[], []]
-    )
+  const { bondGroups, restBonds } = $derived(
+    getBondListGroups(bonds, strategy.assets)
   );
 
   onMount(async () => {
@@ -86,7 +71,7 @@
     {/if}
     <BondList>
       <BondListHeader
-        {selectedBonds}
+        groups={bondGroups}
         {filter}
         onFilterChange={async (value) => {
           filter = value;
@@ -94,12 +79,11 @@
           setBondListFilter(value);
         }}
       />
-      {#each selectedBonds as bond (bond.isin)}
-        <BondListRow
-          {bond}
-          strategyAsset={assetsMap[bond.isin]}
-          onAddToStrategy={onAddBondToStrategy}
-          onRemoveFromStrategy={onRemoveBondFromStrategy}
+      {#each bondGroups as group (group.id)}
+        <BondListRowGroup
+          {group}
+          {onAddBondToStrategy}
+          {onRemoveBondFromStrategy}
         />
       {/each}
       {#each restBonds as bond (bond.isin)}

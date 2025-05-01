@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getUserContext } from "$lib/auth/context";
-  import type { Bond, BondListFilter } from "$lib/trpc";
+  import type { BondListFilter } from "$lib/trpc";
   import BondListItem from "./BondListItem.svelte";
   import FilterButton from "../../../lib/ui/filters/FilterButton.svelte";
   import type { Promisable } from "type-fest";
@@ -9,15 +9,16 @@
   import FilterRisksForm from "../filters/FilterRisksForm.svelte";
   import FilterYieldForm from "../filters/FilterYieldForm.svelte";
   import FilterMaturityDateForm from "../filters/FilterMaturityDateForm.svelte";
+  import type { BondGroup, SelectedBond } from "./getBondListGroups";
 
   const user = getUserContext();
 
   let {
-    selectedBonds,
+    groups,
     filter,
     onFilterChange,
   }: {
-    selectedBonds: Bond[];
+    groups: BondGroup[];
     filter: BondListFilter;
     onFilterChange: (filter: BondListFilter) => Promisable<void>;
   } = $props();
@@ -26,11 +27,15 @@
   let filterRisksModal = $state<Modal | null>(null);
   let filterYieldModal = $state<Modal | null>(null);
   let filterMaturityDateModal = $state<Modal | null>(null);
+
+  let totalSelected = $derived(
+    groups.reduce((acc, group) => acc + group.selectedBonds.length, 0)
+  );
 </script>
 
 <BondListItem sticky>
   {#if user}
-    <div>{selectedBonds.length} шт.</div>
+    <div>{totalSelected} шт.</div>
   {/if}
 
   <div class="flex flex-col gap-2">

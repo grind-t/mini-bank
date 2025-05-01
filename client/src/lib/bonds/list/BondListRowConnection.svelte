@@ -16,7 +16,7 @@
 
   <div
     class="absolute w-px left-[23.5px] bg-base-content/10"
-    style:top="{prevRowTop + checkboxBottom - 0.5}px"
+    style:top="{prevRowTop + checkboxBottom}px"
     style:height="{prevRowHeight - checkboxHeight}px"
   ></div>
 {/if}

@@ -6,7 +6,7 @@
 
 <input
   value={props.value || undefined}
-  class="input m-2"
+  class="flex-none input m-2"
   type="text"
   placeholder="Сумма на {getCurrentMonthName('ru')}"
   onchange={(e) => {

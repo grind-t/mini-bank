@@ -3,16 +3,13 @@
   import BooleanFilterFieldset from "$lib/ui/filters/BooleanFilterFieldset.svelte";
   import NumberFilterFieldset from "$lib/ui/filters/NumberFilterFieldset.svelte";
   import StringFilterFieldset from "$lib/ui/filters/StringFilterFieldset.svelte";
-  import GenericError from "$lib/ui/GenericError.svelte";
-  import GenericLoader from "$lib/ui/GenericLoader.svelte";
-  import type { Promisable } from "type-fest";
 
   let {
     filter,
     onSubmit,
   }: {
     filter: BondListFilter;
-    onSubmit: (filter: BondListFilter) => Promisable<void>;
+    onSubmit: (filter: BondListFilter) => void;
   } = $props();
 
   let effectiveYield = $state(filter.yield || {});
@@ -20,13 +17,12 @@
   let currency = $state(filter.currency || {});
   let hasAmortization = $state(filter.hasAmortization || {});
   let hasOffer = $state(filter.hasOffer || {});
-  let submitPromise = $state<Promisable<void>>();
 </script>
 
 <form
   onsubmit={(e) => {
     e.preventDefault();
-    submitPromise = onSubmit({
+    onSubmit({
       ...filter,
       yield: effectiveYield,
       nominal,
@@ -47,13 +43,5 @@
     <BooleanFilterFieldset legend="Амортизация" bind:value={hasAmortization} />
     <BooleanFilterFieldset legend="Оферта" bind:value={hasOffer} />
   </div>
-  <button class="btn btn-primary mt-4">
-    {#await submitPromise}
-      <GenericLoader />
-    {:then}
-      Применить
-    {:catch error}
-      <GenericError {error} />
-    {/await}
-  </button>
+  <button class="btn btn-primary mt-4">Применить</button>
 </form>

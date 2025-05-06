@@ -1,102 +1,98 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { trpc } from "$lib/trpc";
-  import type {
-    Bond,
-    BondListFilter,
-    DCAStrategy,
-    DCAStrategyAsset,
-  } from "$lib/trpc";
-  import BondList from "$lib/bonds/list/BondList.svelte";
+  import type { Bond, BondListFilter, DCAStrategy } from "$lib/trpc";
   import CurrentMonthBudget from "$lib/bonds/dca/CurrentMonthBudget.svelte";
-  import BondListRow from "$lib/bonds/list/BondListRow.svelte";
-  import BondListHeader from "$lib/bonds/list/BondListHeader.svelte";
   import DCAButton from "$lib/bonds/dca/DCAButton.svelte";
   import { getUserContext } from "$lib/auth/context";
   import {
     getBondListFilter,
     setBondListFilter,
   } from "$lib/bonds/filters/storage";
-  import { getBondListGroups } from "$lib/bonds/list/getBondListGroups";
-  import BondListRowGroup from "$lib/bonds/list/BondListRowGroup.svelte";
+  import GenericLoader from "$lib/ui/GenericLoader.svelte";
+  import GenericError from "$lib/ui/GenericError.svelte";
+  import BondList from "$lib/bonds/list/BondList.svelte";
 
   const user = getUserContext();
 
+  let bondsPromise = $state<Promise<Bond[]>>();
   let filter = $state<BondListFilter>(getBondListFilter());
-  let bonds = $state<Bond[]>([]);
-  let strategy = $state<DCAStrategy>({
-    id: "bonds",
-    currentMonthBudget: 0,
-    assets: [],
-  });
+  let strategy = $state<DCAStrategy>();
 
-  const { bondGroups, restBonds } = $derived(
-    getBondListGroups(bonds, strategy.assets)
-  );
+  function fetchBonds() {
+    const whitelist = strategy?.assets.map((v) => v.isin);
 
-  onMount(async () => {
-    if (user) {
-      strategy = await trpc.dcaStrategies.get
-        .query({ id: "bonds" })
-        .then((v) => v ?? strategy);
+    bondsPromise = trpc.bonds.list.query({
+      filter: {
+        ...filter,
+        whitelist,
+      },
+    });
 
-      filter.whitelist = strategy.assets.map((v) => v.isin);
-    }
-
-    bonds = await trpc.bonds.list.query({ filter });
-  });
-
-  function onAddBondToStrategy(asset: DCAStrategyAsset) {
-    strategy.assets.push(asset);
-    trpc.dcaStrategies.set.mutate(strategy);
+    return bondsPromise;
   }
 
-  function onRemoveBondFromStrategy(asset: DCAStrategyAsset) {
-    const idx = strategy.assets.findIndex((v) => v === asset);
-    strategy.assets.splice(idx, 1);
-    trpc.dcaStrategies.set.mutate(strategy);
+  async function fetchDCAStrategy() {
+    if (!user) return;
+
+    strategy = (await trpc.dcaStrategies.get.query({ id: "bonds" })) ?? {
+      id: "bonds",
+      currentMonthBudget: 0,
+      assets: [],
+    };
+
+    return strategy;
   }
 </script>
 
 <main class="flex flex-col flex-1">
-  {#if bonds.length}
-    {#if user}
+  {#await fetchDCAStrategy().then(fetchBonds)}
+    <GenericLoader />
+  {:then}
+    {#if strategy}
       <CurrentMonthBudget
         value={strategy.currentMonthBudget}
         onChange={(value) => {
+          if (!strategy) return;
           strategy.currentMonthBudget = value;
           trpc.dcaStrategies.set.mutate(strategy);
         }}
       />
     {/if}
-    <BondList>
-      <BondListHeader
-        groups={bondGroups}
+
+    {#await bondsPromise}
+      <GenericLoader />
+    {:then bonds}
+      <BondList
+        {bonds}
         {filter}
-        onFilterChange={async (value) => {
+        {strategy}
+        onFilterChange={(value) => {
           filter = value;
-          bonds = await trpc.bonds.list.query({ filter });
           setBondListFilter(value);
+          fetchBonds();
+        }}
+        onAddBondToStrategy={async (asset) => {
+          if (!strategy) return;
+          strategy.assets.push(asset);
+          await trpc.dcaStrategies.set.mutate(strategy);
+          fetchDCAStrategy();
+        }}
+        onRemoveBondFromStrategy={async (asset) => {
+          if (!strategy) return;
+          const idx = strategy.assets.findIndex((v) => v === asset);
+          strategy.assets.splice(idx, 1);
+          await trpc.dcaStrategies.set.mutate(strategy);
+          fetchDCAStrategy();
         }}
       />
-      {#each bondGroups as group (group.id)}
-        <BondListRowGroup
-          {group}
-          {onAddBondToStrategy}
-          {onRemoveBondFromStrategy}
-        />
-      {/each}
-      {#each restBonds as bond (bond.isin)}
-        <BondListRow
-          {bond}
-          onAddToStrategy={onAddBondToStrategy}
-          onRemoveFromStrategy={onRemoveBondFromStrategy}
-        />
-      {/each}
-    </BondList>
 
-    {#if user}
-      <DCAButton />
-    {/if}
-  {/if}
+      {#if strategy}
+        <DCAButton />
+      {/if}
+    {:catch error}
+      <GenericError {error} />
+    {/await}
+  {:catch error}
+    <GenericError {error} />
+  {/await}
 </main>

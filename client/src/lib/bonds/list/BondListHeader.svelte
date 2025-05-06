@@ -3,13 +3,12 @@
   import type { BondListFilter } from "$lib/trpc";
   import BondListItem from "./BondListItem.svelte";
   import FilterButton from "../../../lib/ui/filters/FilterButton.svelte";
-  import type { Promisable } from "type-fest";
   import Modal from "$lib/ui/Modal.svelte";
   import FilterCompaniesForm from "../filters/FilterCompaniesForm.svelte";
   import FilterRisksForm from "../filters/FilterRisksForm.svelte";
   import FilterYieldForm from "../filters/FilterYieldForm.svelte";
   import FilterMaturityDateForm from "../filters/FilterMaturityDateForm.svelte";
-  import type { BondGroup, SelectedBond } from "./getBondListGroups";
+  import type { BondGroup } from "./getBondListGroups";
 
   const user = getUserContext();
 
@@ -20,7 +19,7 @@
   }: {
     groups: BondGroup[];
     filter: BondListFilter;
-    onFilterChange: (filter: BondListFilter) => Promisable<void>;
+    onFilterChange: (filter: BondListFilter) => void;
   } = $props();
 
   let filterCompaniesModal = $state<Modal | null>(null);
@@ -47,8 +46,8 @@
     <Modal bind:this={filterCompaniesModal}>
       <FilterCompaniesForm
         {filter}
-        onSubmit={async (v) => {
-          await onFilterChange(v);
+        onSubmit={(v) => {
+          onFilterChange(v);
           filterCompaniesModal?.close();
         }}
       />
@@ -61,8 +60,8 @@
     <Modal bind:this={filterRisksModal}>
       <FilterRisksForm
         {filter}
-        onSubmit={async (v) => {
-          await onFilterChange(v);
+        onSubmit={(v) => {
+          onFilterChange(v);
           filterRisksModal?.close();
         }}
       />
@@ -75,8 +74,8 @@
     <Modal bind:this={filterYieldModal}>
       <FilterYieldForm
         {filter}
-        onSubmit={async (v) => {
-          await onFilterChange(v);
+        onSubmit={(v) => {
+          onFilterChange(v);
           filterYieldModal?.close();
         }}
       />
@@ -92,8 +91,8 @@
     <Modal bind:this={filterMaturityDateModal}>
       <FilterMaturityDateForm
         {filter}
-        onSubmit={async (v) => {
-          await onFilterChange(v);
+        onSubmit={(v) => {
+          onFilterChange(v);
           filterMaturityDateModal?.close();
         }}
       />

@@ -1,12 +1,13 @@
+export const tInvestBondRatings = {
+  0: "T-C",
+  1: "T-B",
+  2: "T-A",
+};
+
+export type TInvestBondRatingValue = keyof typeof tInvestBondRatings;
+export type TInvestBondRatingLabel =
+  (typeof tInvestBondRatings)[TInvestBondRatingValue];
+
 export function getTInvestBondRatingText(rating: number): string {
-  switch (rating) {
-    case 0:
-      return "T-C";
-    case 1:
-      return "T-B";
-    case 2:
-      return "T-A";
-    default:
-      return "T-U";
-  }
+  return tInvestBondRatings[rating as TInvestBondRatingValue] ?? "T-U";
 }

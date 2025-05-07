@@ -2,6 +2,16 @@
   import type { BondListFilter } from "$lib/trpc";
   import BooleanFilterFieldset from "$lib/ui/filters/BooleanFilterFieldset.svelte";
   import NumberFilterFieldset from "$lib/ui/filters/NumberFilterFieldset.svelte";
+  import { bondFinderRatings } from "../rating/getBondFinderRatingText";
+  import { tInvestBondRatings } from "../rating/getTInvestBondRatingText";
+
+  const bondFinderRatingItems = Object.entries(bondFinderRatings)
+    .map(([value, label]) => ({ label, value: Number(value) }))
+    .sort((a, b) => b.value - a.value);
+
+  const tInvestBondRatingItems = Object.entries(tInvestBondRatings)
+    .map(([value, label]) => ({ label, value: Number(value) }))
+    .sort((a, b) => b.value - a.value);
 
   let {
     filter,
@@ -34,8 +44,15 @@
     <NumberFilterFieldset
       legend="Рейтинг рейтингового агенства"
       bind:value={bondFinder}
+      gteItems={bondFinderRatingItems}
+      lteItems={bondFinderRatingItems}
     />
-    <NumberFilterFieldset legend="Рейтинг Т-Инвестиций" bind:value={tInvest} />
+    <NumberFilterFieldset
+      legend="Рейтинг Т-Инвестиций"
+      bind:value={tInvest}
+      gteItems={tInvestBondRatingItems}
+      lteItems={tInvestBondRatingItems}
+    />
     <BooleanFilterFieldset
       legend="Для квалифицированных инвесторов"
       bind:value={forQual}

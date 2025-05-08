@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { NumberFilter } from "$lib/trpc";
+  import SignleSelect from "../SignleSelect.svelte";
   import FilterFieldset from "./FilterFieldset.svelte";
 
   let {
@@ -19,12 +20,7 @@
   <label class={gteItems ? "select" : "input"}>
     <span class="label">Не меньше</span>
     {#if gteItems}
-      <select bind:value={value.gte}>
-        <option value={undefined}></option>
-        {#each gteItems as item}
-          <option value={item.value}>{item.label}</option>
-        {/each}
-      </select>
+      <SignleSelect items={gteItems} bind:value={value.gte} />
     {:else}
       <input type="number" bind:value={value.gte} />
     {/if}
@@ -32,12 +28,7 @@
   <label class={lteItems ? "select" : "input"}>
     <span class="label">Не больше</span>
     {#if lteItems}
-      <select bind:value={value.lte}>
-        <option value={undefined}></option>
-        {#each lteItems as item}
-          <option value={item.value}>{item.label}</option>
-        {/each}
-      </select>
+      <SignleSelect items={lteItems} bind:value={value.lte} />
     {:else}
       <input type="number" bind:value={value.lte} />
     {/if}

@@ -39,7 +39,7 @@
 
 <ul
   bind:this={popoverElement}
-  class="dropdown menu h-full max-h-fit min-w-52 max-w-80 rounded-box bg-base-100 shadow-sm overflow-y-auto overflow-x-hidden"
+  class="dropdown menu h-full max-h-fit w-full max-w-80 rounded-box bg-base-100 shadow-sm overflow-y-auto overflow-x-hidden"
   popover="auto"
   id="popover-{uid}"
   style:position-anchor="--anchor-{uid}"

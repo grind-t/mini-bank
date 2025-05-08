@@ -21,7 +21,7 @@ export function getBondListFilter(): BondListFilter {
         gte: 2,
       },
       bondFinder: {
-        gte: 4,
+        gte: 3.9,
       },
     },
     nominal: {

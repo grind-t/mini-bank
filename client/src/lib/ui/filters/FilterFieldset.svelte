@@ -6,7 +6,7 @@
 
 <fieldset class="fieldset">
   <legend class="fieldset-legend">{legend}</legend>
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-2 min-w-0">
     {@render children()}
   </div>
 </fieldset>

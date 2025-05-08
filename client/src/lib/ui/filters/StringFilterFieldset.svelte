@@ -17,7 +17,7 @@
 </script>
 
 <FilterFieldset {legend}>
-  <label class="input max-w-80">
+  <label class="input">
     <span class="label">Включает</span>
     {#if inItems}
       <MultiSelect items={inItems} bind:value={value.in} />
@@ -33,7 +33,7 @@
       />
     {/if}
   </label>
-  <label class="input max-w-80">
+  <label class="input">
     <span class="label">Исключает</span>
     {#if ninItems}
       <MultiSelect items={ninItems} bind:value={value.nin} />

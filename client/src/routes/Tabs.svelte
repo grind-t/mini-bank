@@ -4,6 +4,7 @@
   import { getUserContext } from "$lib/auth/context";
 
   const profileUrl = `${base}/`;
+  const inflationUrl = `${base}/inflation`;
   const bondsUrl = `${base}/bonds`;
   const logsUrl = `${base}/logs`;
 
@@ -21,6 +22,14 @@
     class:tab-active={page.url.pathname === profileUrl}
   >
     Профиль
+  </a>
+  <a
+    role="tab"
+    class="tab"
+    href={inflationUrl}
+    class:tab-active={page.url.pathname === inflationUrl}
+  >
+    Инфляция
   </a>
   <a
     role="tab"

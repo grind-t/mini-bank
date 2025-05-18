@@ -26,6 +26,9 @@ export type BondListFilter = NonNullable<
 export type DCAStrategy = NonNullable<RouterOutput["dcaStrategies"]["get"]>;
 export type DCAStrategyAsset = DCAStrategy["assets"][number];
 
+export type EstateInflation = RouterOutput["inflation"]["estate"]["get"];
+export type EstateInflationParams = RouterInput["inflation"]["estate"]["get"];
+
 export type StringFilter = NonNullable<BondListFilter["sector"]>;
 export type NumberFilter = NonNullable<BondListFilter["yield"]>;
 export type DateFilter = NonNullable<BondListFilter["maturityDate"]>;

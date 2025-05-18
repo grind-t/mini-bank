@@ -16,7 +16,7 @@
     const month = item.monthInflation.toFixed(2);
     const monthSign = item.monthInflation > 0 ? "+" : "";
 
-    return `${year}%, (${monthSign}${month}%)`;
+    return `${year}% (${monthSign}${month}%)`;
   }
 </script>
 

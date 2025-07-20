@@ -13,8 +13,8 @@ export function getBondListFilter(): BondListFilter {
 
   return {
     yield: {
-      gte: 22,
-      lte: 32,
+      gte: 19,
+      lte: 29,
     },
     rating: {
       tInvest: {
@@ -28,15 +28,12 @@ export function getBondListFilter(): BondListFilter {
       lte: 10000,
     },
     maturityDate: {
-      lte: dayjs().add(2, "years").toDate(),
+      lte: dayjs().add(2, "years").add(6, 'months').toDate(),
       gte: dayjs().add(1, "month").toDate(),
       unit: "day",
     },
     currency: {
       in: ["rub"],
-    },
-    sector: {
-      nin: ["real_estate"],
     },
     hasAmortization: { eq: false },
     hasOffer: { eq: false },

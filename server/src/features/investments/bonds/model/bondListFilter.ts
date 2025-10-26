@@ -7,12 +7,8 @@ import { StringFilterSchema } from "#features/filters/string.schema.ts";
 export const BondListFilterSchema = z.object({
   whitelist: z.array(z.string()).optional(),
   blacklist: z.array(z.string()).optional(),
-  yield: z
-    .object({
-      effective: NumberFilterSchema.optional(),
-      prevWAPrice: NumberFilterSchema.optional(),
-    })
-    .optional(),
+  ytm: NumberFilterSchema.optional(),
+  eytm: NumberFilterSchema.optional(),
   rating: z
     .object({
       tInvest: NumberFilterSchema.optional(),

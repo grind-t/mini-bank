@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@auth/sveltekit": "^1.8.0",
+    "@grind-t/cbr-ratings": "^1.0.2",
     "@grind-t/toolkit": "^2.1.0",
     "@tailwindcss/vite": "^4.0.0",
     "@tauri-apps/api": "^2",

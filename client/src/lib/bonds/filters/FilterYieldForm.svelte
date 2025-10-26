@@ -12,7 +12,8 @@
     onSubmit: (filter: BondListFilter) => void;
   } = $props();
 
-  let effectiveYield = $state(filter.yield || {});
+  let ytm = $state(filter.ytm || {});
+  let eytm = $state(filter.eytm || {});
   let nominal = $state(filter.nominal || {});
   let currency = $state(filter.currency || {});
   let hasAmortization = $state(filter.hasAmortization || {});
@@ -24,7 +25,8 @@
     e.preventDefault();
     onSubmit({
       ...filter,
-      yield: effectiveYield,
+      ytm,
+      eytm,
       nominal,
       currency,
       hasAmortization,
@@ -34,9 +36,10 @@
 >
   <h2 class="mb-2">Фильтр доходности</h2>
   <div class="flex flex-col gap-2">
+    <NumberFilterFieldset legend="Доходность к погашению" bind:value={ytm} />
     <NumberFilterFieldset
-      legend="Эффективная доходность"
-      bind:value={effectiveYield}
+      legend="Эффективная доходность к погашению"
+      bind:value={eytm}
     />
     <NumberFilterFieldset legend="Номинал" bind:value={nominal} />
     <StringFilterFieldset legend="Валюта" bind:value={currency} />

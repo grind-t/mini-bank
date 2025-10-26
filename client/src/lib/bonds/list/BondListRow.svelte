@@ -1,11 +1,12 @@
 <script lang="ts">
   import { getUserContext } from "$lib/auth/context";
   import { getTInvestBondRatingText } from "../rating/getTInvestBondRatingText";
-  import { getBondFinderRatingText } from "../rating/getBondFinderRatingText";
   import type { Bond, DCAStrategyAsset } from "$lib/trpc";
   import { getYearsLabel } from "@grind-t/toolkit/date";
   import BondListItem from "./BondListItem.svelte";
   import dayjs from "dayjs";
+  import { ratingScale } from "@grind-t/cbr-ratings";
+  import { getBondCurrencyText } from "../currency/getBondCurrencyText";
 
   const user = getUserContext();
 
@@ -54,7 +55,7 @@
   <div class="flex flex-col gap-2">
     <div>{bond.name}</div>
     <button
-      class="h-fit"
+      class="h-fit flex items-center gap-1"
       aria-label="Скопировать isin"
       onclick={() => navigator.clipboard.writeText(bond.isin)}
     >
@@ -62,7 +63,7 @@
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 16 16"
         fill="currentColor"
-        class="size-4"
+        class="size-4 flex-none"
       >
         <path
           d="M5.5 3.5A1.5 1.5 0 0 1 7 2h2.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 1 .439 1.061V9.5A1.5 1.5 0 0 1 12 11V8.621a3 3 0 0 0-.879-2.121L9 4.379A3 3 0 0 0 6.879 3.5H5.5Z"
@@ -71,19 +72,34 @@
           d="M4 5a1.5 1.5 0 0 0-1.5 1.5v6A1.5 1.5 0 0 0 4 14h5a1.5 1.5 0 0 0 1.5-1.5V8.621a1.5 1.5 0 0 0-.44-1.06L7.94 5.439A1.5 1.5 0 0 0 6.878 5H4Z"
         />
       </svg>
+      <div class="leading-none flex-none mb-px">
+        {getBondCurrencyText(bond.currency)}
+      </div>
     </button>
   </div>
 
   <div class="flex flex-col gap-2">
-    {#if bond.rating.bondFinder}
-      <div>{getBondFinderRatingText(bond.rating.bondFinder)}</div>
-    {/if}
     {#if bond.rating.tInvest !== undefined}
       <div>{getTInvestBondRatingText(bond.rating.tInvest)}</div>
     {/if}
+    {#if bond.rating.AKRA !== undefined}
+      <div>АКРА {ratingScale[bond.rating.AKRA]}</div>
+    {/if}
+    {#if bond.rating.NKR !== undefined}
+      <div>НКР {ratingScale[bond.rating.NKR]}</div>
+    {/if}
+    {#if bond.rating.EXPERT_RA !== undefined}
+      <div>ЭРА {ratingScale[bond.rating.EXPERT_RA]}</div>
+    {/if}
+    {#if bond.rating.NRA !== undefined}
+      <div>НРА {ratingScale[bond.rating.NRA]}</div>
+    {/if}
   </div>
 
-  <div>{bond.isFloater ? "~" : ""}{bond.yield}%</div>
+  <div class="flex flex-col gap-2">
+    <div>YTM {bond.isFloater ? "~" : ""}{bond.ytm}%</div>
+    <div>EYTM {bond.isFloater ? "~" : ""}{bond.eytm}%</div>
+  </div>
 
   <div>
     {#if bond.maturityDate}

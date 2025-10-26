@@ -1,4 +1,5 @@
 import type { BondListFilter } from "$lib/trpc";
+import { ratingScale } from "@grind-t/cbr-ratings";
 import dayjs from "dayjs";
 import SuperJSON from "superjson";
 
@@ -12,23 +13,26 @@ export function getBondListFilter(): BondListFilter {
   }
 
   return {
-    yield: {
-      gte: 19,
-      lte: 29,
+    ytm: {
+      gte: 17,
+      lte: 27,
     },
     rating: {
       tInvest: {
         gte: 2,
       },
-      bondFinder: {
-        gte: 3.9,
+      AKRA: {
+        gte: ratingScale.indexOf("A-"),
+      },
+      NKR: {
+        gte: ratingScale.indexOf("A-"),
       },
     },
     nominal: {
       lte: 10000,
     },
     maturityDate: {
-      lte: dayjs().add(2, "years").add(6, 'months').toDate(),
+      lte: dayjs().add(2, "years").add(6, "months").toDate(),
       gte: dayjs().add(1, "month").toDate(),
       unit: "day",
     },

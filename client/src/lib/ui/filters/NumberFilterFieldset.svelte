@@ -22,7 +22,10 @@
     {#if gteItems}
       <SignleSelect items={gteItems} bind:value={value.gte} />
     {:else}
-      <input type="number" bind:value={value.gte} />
+      <input
+        type="number"
+        bind:value={() => value.gte, (v) => (value.gte = v ?? undefined)}
+      />
     {/if}
   </label>
   <label class={lteItems ? "select" : "input"}>
@@ -30,7 +33,10 @@
     {#if lteItems}
       <SignleSelect items={lteItems} bind:value={value.lte} />
     {:else}
-      <input type="number" bind:value={value.lte} />
+      <input
+        type="number"
+        bind:value={() => value.lte, (v) => (value.lte = v ?? undefined)}
+      />
     {/if}
   </label>
 </FilterFieldset>

@@ -24,21 +24,23 @@ export function getBondListGroups(
     const asset = assetsByIsin[bond.isin];
 
     if (asset) {
-      const group = bondGroupsByEmitent.get(bond.emitentId) ?? {
-        id: bond.emitentId,
+      const groupId = bond.emitent?.id || crypto.randomUUID();
+      const group = bondGroupsByEmitent.get(groupId) ?? {
+        id: groupId,
         selectedBonds: [],
         unselectedBonds: [],
       };
 
       group.selectedBonds.push({ value: bond, strategyAsset: asset });
-      bondGroupsByEmitent.set(bond.emitentId, group);
+      bondGroupsByEmitent.set(groupId, group);
     }
   }
 
   for (const bond of bonds) {
     if (assetsByIsin[bond.isin]) continue;
 
-    const group = bondGroupsByEmitent.get(bond.emitentId);
+    const groupId = bond.emitent?.id;
+    const group = groupId && bondGroupsByEmitent.get(groupId);
 
     if (group) {
       group.unselectedBonds.push(bond);

@@ -9,8 +9,7 @@ export async function listAllBonds(): Promise<Bond[]> {
     );
     return bonds.sort(
       (a, b) =>
-        (b.yield.effective || b.yield.prevWAPrice || 0) -
-        (a.yield.effective || a.yield.prevWAPrice || 0)
+        Math.max(b.ytm || 0, b.eytm || 0) - Math.max(a.ytm || 0, a.eytm || 0)
     );
   });
 }

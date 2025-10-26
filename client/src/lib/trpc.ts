@@ -30,6 +30,6 @@ export type EstateInflation = RouterOutput["inflation"]["estate"]["get"];
 export type EstateInflationParams = RouterInput["inflation"]["estate"]["get"];
 
 export type StringFilter = NonNullable<BondListFilter["sector"]>;
-export type NumberFilter = NonNullable<BondListFilter["yield"]>;
+export type NumberFilter = NonNullable<BondListFilter["ytm"]>;
 export type DateFilter = NonNullable<BondListFilter["maturityDate"]>;
 export type BooleanFilter = NonNullable<BondListFilter["forQual"]>;

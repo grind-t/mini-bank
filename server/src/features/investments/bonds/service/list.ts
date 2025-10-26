@@ -14,9 +14,13 @@ export async function listBonds(filter?: BondListFilter) {
     (bond) =>
       filter.whitelist?.includes(bond.isin) ||
       (!filter.blacklist?.includes(bond.isin) &&
-        numberFilter(bond.yield, filter.yield) &&
+        numberFilter(bond.yield.effective, filter.yield?.effective) &&
+        numberFilter(bond.yield.prevWAPrice, filter.yield?.prevWAPrice) &&
         numberFilter(bond.rating.tInvest, filter.rating?.tInvest) &&
-        numberFilter(bond.rating.bondFinder, filter.rating?.bondFinder) &&
+        numberFilter(bond.rating.AKRA, filter.rating?.AKRA) &&
+        numberFilter(bond.rating.NKR, filter.rating?.NKR) &&
+        numberFilter(bond.rating.EXPERT_RA, filter.rating?.EXPERT_RA) &&
+        numberFilter(bond.rating.NRA, filter.rating?.NRA) &&
         numberFilter(bond.nominal, filter.nominal) &&
         dateFilter(bond.maturityDate, filter.maturityDate) &&
         stringFilter(bond.currency, filter.currency) &&

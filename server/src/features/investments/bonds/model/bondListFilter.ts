@@ -1,17 +1,25 @@
+import { z } from "zod";
 import { BooleanFilterSchema } from "#features/filters/boolean.schema.ts";
 import { DateFilterSchema } from "#features/filters/date.schema.ts";
 import { NumberFilterSchema } from "#features/filters/number.schema.ts";
 import { StringFilterSchema } from "#features/filters/string.schema.ts";
-import { z } from "zod";
 
 export const BondListFilterSchema = z.object({
   whitelist: z.array(z.string()).optional(),
   blacklist: z.array(z.string()).optional(),
-  yield: NumberFilterSchema.optional(),
+  yield: z
+    .object({
+      effective: NumberFilterSchema.optional(),
+      prevWAPrice: NumberFilterSchema.optional(),
+    })
+    .optional(),
   rating: z
     .object({
       tInvest: NumberFilterSchema.optional(),
-      bondFinder: NumberFilterSchema.optional(),
+      AKRA: NumberFilterSchema.optional(),
+      NKR: NumberFilterSchema.optional(),
+      EXPERT_RA: NumberFilterSchema.optional(),
+      NRA: NumberFilterSchema.optional(),
     })
     .optional(),
   nominal: NumberFilterSchema.optional(),

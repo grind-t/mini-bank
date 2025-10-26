@@ -32,6 +32,7 @@
       currency,
       hasAmortization,
       hasOffer,
+      isFloater,
     });
   }}
 >

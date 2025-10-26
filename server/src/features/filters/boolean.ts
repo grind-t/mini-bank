@@ -8,5 +8,7 @@ export function booleanFilter(value?: boolean, filter?: BooleanFilter) {
   if (isNullish(filter)) return true;
   if (isNullish(value)) return !filter.exists;
 
-  return filter.exists !== false && value === filter.eq;
+  return (
+    filter.exists !== false && (isNullish(filter.eq) || value === filter.eq)
+  );
 }

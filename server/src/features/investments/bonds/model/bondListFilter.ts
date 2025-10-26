@@ -25,6 +25,7 @@ export const BondListFilterSchema = z.object({
   hasAmortization: BooleanFilterSchema.optional(),
   hasOffer: BooleanFilterSchema.optional(),
   forQual: BooleanFilterSchema.optional(),
+  isFloater: BooleanFilterSchema.optional(),
 });
 
 export type BondListFilter = z.infer<typeof BondListFilterSchema>;

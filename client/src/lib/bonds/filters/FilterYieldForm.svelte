@@ -18,6 +18,7 @@
   let currency = $state(filter.currency || {});
   let hasAmortization = $state(filter.hasAmortization || {});
   let hasOffer = $state(filter.hasOffer || {});
+  let isFloater = $state(filter.isFloater || {});
 </script>
 
 <form
@@ -45,6 +46,7 @@
     <StringFilterFieldset legend="Валюта" bind:value={currency} />
     <BooleanFilterFieldset legend="Амортизация" bind:value={hasAmortization} />
     <BooleanFilterFieldset legend="Оферта" bind:value={hasOffer} />
+    <BooleanFilterFieldset legend="Флоатер" bind:value={isFloater} />
   </div>
   <button class="btn btn-primary mt-4">Применить</button>
 </form>

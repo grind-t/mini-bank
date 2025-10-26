@@ -32,7 +32,7 @@ export function getBondListFilter(): BondListFilter {
       lte: 10000,
     },
     maturityDate: {
-      lte: dayjs().add(2, "years").add(6, "months").toDate(),
+      lte: dayjs().add(2, "years").toDate(),
       gte: dayjs().add(1, "month").toDate(),
       unit: "day",
     },

@@ -27,6 +27,7 @@ export async function listBonds(filter?: BondListFilter) {
         stringFilter(bond.sector, filter.sector) &&
         booleanFilter(bond.hasAmortization, filter.hasAmortization) &&
         booleanFilter(bond.hasOffer, filter.hasOffer) &&
-        booleanFilter(bond.forQual, filter.forQual))
+        booleanFilter(bond.forQual, filter.forQual) &&
+        booleanFilter(bond.isFloater, filter.isFloater))
   );
 }

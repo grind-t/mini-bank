@@ -18,12 +18,10 @@
   <label class="label">
     <input
       indeterminate={isIndeterminate}
-      bind:checked={
-        () => value.eq,
-        () => {
-          value.eq = isIndeterminate ? false : isChecked ? undefined : true;
-        }
-      }
+      checked={value.eq}
+      onchange={() => {
+        value.eq = isIndeterminate ? false : isChecked ? undefined : true;
+      }}
       type="checkbox"
       class="checkbox"
     />

@@ -23,6 +23,7 @@ export async function executeDCAStrategy(
   accountId: string,
   ctx: UserCtx & TInvestCtx
 ) {
+  debugger;
   const accountPromise = getInvestAccountFromTInvestApi(accountId, ctx);
   const assetsPromise = getAssetsFromTInvestApi(
     strategy.assets.map((v) => v.isin),
@@ -34,14 +35,14 @@ export async function executeDCAStrategy(
   ).then(async (tradingDays) => {
     const budget = strategy.currentMonthBudget / tradingDays;
 
-    await repoTransfer(
+    /*await repoTransfer(
       {
         accountId,
         direction: OrderDirection.ORDER_DIRECTION_SELL,
         minSum: budget,
       },
       ctx
-    );
+    );*/
 
     return budget;
   });
@@ -52,12 +53,13 @@ export async function executeDCAStrategy(
     budgetPromise,
   ]);
 
-  const initialAssets = mergeAccountAssets(
-    assets.filter((v) => !isNullish(v)),
-    account.assets
+  const validAssets = assets.filter((v) => !isNullish(v));
+  const validStrategyAssets = strategy.assets.filter(
+    (_, i) => !isNullish(assets[i])
   );
 
-  const targetRatios = getDCAStrategyAssetsRatios(strategy.assets);
+  const initialAssets = mergeAccountAssets(validAssets, account.assets);
+  const targetRatios = getDCAStrategyAssetsRatios(validStrategyAssets);
   const rebalancedAssets = rebalanceInvestAccount(
     initialAssets,
     targetRatios,
@@ -102,7 +104,7 @@ export async function executeDCAStrategy(
   setDCAStrategy(
     {
       id: strategy.id,
-      assets: strategy.assets.filter((_, i) => !isNullish(assets[i])),
+      assets: validStrategyAssets,
       currentMonthBudget: strategy.currentMonthBudget - spent,
     },
     ctx

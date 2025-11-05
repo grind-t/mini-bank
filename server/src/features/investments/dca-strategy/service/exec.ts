@@ -23,7 +23,6 @@ export async function executeDCAStrategy(
   accountId: string,
   ctx: UserCtx & TInvestCtx
 ) {
-  debugger;
   const accountPromise = getInvestAccountFromTInvestApi(accountId, ctx);
   const assetsPromise = getAssetsFromTInvestApi(
     strategy.assets.map((v) => v.isin),
@@ -35,14 +34,14 @@ export async function executeDCAStrategy(
   ).then(async (tradingDays) => {
     const budget = strategy.currentMonthBudget / tradingDays;
 
-    /*await repoTransfer(
+    await repoTransfer(
       {
         accountId,
         direction: OrderDirection.ORDER_DIRECTION_SELL,
         minSum: budget,
       },
       ctx
-    );*/
+    );
 
     return budget;
   });
